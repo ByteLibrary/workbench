@@ -1,0 +1,16 @@
+name: CI
+
+on:
+  pull_request:
+    types: [opened, edited, reopened, synchronize]
+
+permissions:
+  contents: read
+
+jobs:
+  pull-request-standards:
+    uses: ByteLibrary/reusable-ci-workflows/.github/workflows/pull-request-standards.yml@main
+  documentation:
+    uses: ByteLibrary/reusable-ci-workflows/.github/workflows/documentation.yml@main
+  shell:
+    uses: ByteLibrary/reusable-ci-workflows/.github/workflows/shell.yml@main
