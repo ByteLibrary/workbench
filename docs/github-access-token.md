@@ -62,6 +62,9 @@ Generate new token**
 | Pull requests | Read and write | Opening and updating pull requests |
 | Issues | Read and write | Creating issues and keeping them up to date |
 | Workflows | Read and write | Pushing files under `.github/workflows/` |
+| Actions | Read | Reading workflow runs and their logs |
+| Checks | Read | Reading check results on pull requests |
+| Commit statuses | Read | Reading the combined status of a commit |
 | Metadata | Read | Added automatically |
 
 **Organization permissions:**
