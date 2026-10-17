@@ -1,0 +1,10 @@
+# Workspace-wide settings for ~/ByteLibrary.
+# Written by development-environment/scripts/write-workspace-files.sh. Change it there, not here.
+
+[env]
+# gh uses the ByteLibrary-only login inside the workspace (docs/github-access-token.md).
+GH_CONFIG_DIR = "{{env.HOME}}/.config/gh-bytelibrary"
+
+[tools]
+# Shared tools are added here, with pinned versions, when the first repository needs them:
+# OpenTofu, kubectl, Helm, kind, Buf, Copier. Language toolchains are pinned per repository.

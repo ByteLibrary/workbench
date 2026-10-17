@@ -1,0 +1,74 @@
+# development-environment
+
+Sets up a ByteLibrary development workspace on a new machine: scoped GitHub access, all
+repositories cloned into `~/ByteLibrary/`, workspace-level agent instructions, and a check that
+everything works. Decided in ADR-0018 of the organization handbook.
+
+```mermaid
+flowchart LR
+  token["1. Create the<br/>organization-only token"] --> login["2. Log in gh with<br/>its own config"]
+  login --> clone["3. Clone this<br/>repository"]
+  clone --> setup["4. ./setup.sh"]
+  setup --> access["Scope git and gh<br/>to the workspace"]
+  setup --> repos["Clone all ByteLibrary<br/>repositories"]
+  setup --> files["Write workspace<br/>AGENTS.md and mise.toml"]
+  setup --> doctor["Run the doctor check"]
+```
+
+## Prerequisites
+Tested on **Ubuntu on WSL2**.
+
+| Tool | Install |
+|---|---|
+| git | `sudo apt install git` |
+| GitHub CLI (`gh`) | `sudo apt install gh` |
+| mise | See [mise installation](https://mise.jdx.dev/installing-mise.html), then add `eval "$(mise activate bash)"` to `~/.bashrc` |
+| Docker Engine | See [Docker Engine for Ubuntu](https://docs.docker.com/engine/install/ubuntu/), then add yourself to the `docker` group |
+
+Docker Engine runs directly inside WSL2; Docker Desktop is not needed.
+
+## Setup
+1. **Create the token**, following [docs/github-access-token.md](docs/github-access-token.md).
+2. **Log in** with it, in a ByteLibrary-only `gh` configuration:
+   ```bash
+   GH_CONFIG_DIR=~/.config/gh-bytelibrary gh auth login --hostname github.com --git-protocol https
+   ```
+3. **Clone this repository:**
+   ```bash
+   GH_CONFIG_DIR=~/.config/gh-bytelibrary gh repo clone ByteLibrary/development-environment ~/ByteLibrary/development-environment
+   ```
+4. **Run the setup**, and answer its questions:
+   ```bash
+   ~/ByteLibrary/development-environment/setup.sh
+   ```
+
+## What the setup changes
+
+| Where | Change |
+|---|---|
+| `~/.config/gh-bytelibrary/` | The `gh` login with the ByteLibrary-only token |
+| `~/.gitconfig-bytelibrary` | Commit identity and GitHub credentials for ByteLibrary repositories |
+| `~/.gitconfig` | One `includeIf` line that loads the file above only under `~/ByteLibrary/`. With your confirmation, removes machine-wide GitHub credential helpers (a backup is kept). |
+| `~/ByteLibrary/` | All ByteLibrary repositories, plus the workspace `AGENTS.md` and `mise.toml` |
+
+Nothing outside the workspace can use the token.
+
+## Commands
+Every script is safe to run again.
+
+| Command | Does |
+|---|---|
+| `./setup.sh` | Full setup |
+| `scripts/doctor.sh` | Checks tools, GitHub access and workspace |
+| `scripts/clone-repositories.sh` | Clones repositories added to the organization since the last run |
+| `scripts/write-workspace-files.sh` | Rewrites the workspace `AGENTS.md` and `mise.toml` after they change here |
+
+## Troubleshooting
+
+| Problem | Fix |
+|---|---|
+| `gh` says you are not logged in inside the workspace | Your shell does not have `GH_CONFIG_DIR` set. Check that mise is activated in `~/.bashrc` and run `mise trust ~/ByteLibrary/mise.toml`. |
+| The token check finds private repositories outside ByteLibrary | The token's resource owner is wrong. Delete it and create a new one with ByteLibrary as resource owner. |
+| `git push` asks for a password | The repository is outside `~/ByteLibrary/`, or setup has not run. Run `./setup.sh`. |
+| Docker checks fail | Start the daemon (`sudo service docker start`) and check you are in the `docker` group. |
+| The token expired | Regenerate it (see [docs/github-access-token.md](docs/github-access-token.md#renewing-and-revoking)) and log in again. |
