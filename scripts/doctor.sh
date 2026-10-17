@@ -76,7 +76,7 @@ check_repository_settings
 info "Workspace"
 check "workspace AGENTS.md exists" test -f "$WORKSPACE_DIR/AGENTS.md"
 check "workspace mise.toml exists" test -f "$WORKSPACE_DIR/mise.toml"
-check "organization-handbook is cloned" test -d "$WORKSPACE_DIR/organization-handbook/.git"
+check "handbook is cloned" test -d "$WORKSPACE_DIR/handbook/.git"
 
 if ((failures > 0)); then
   fail "$failures check(s) failed. See README.md, Troubleshooting."
