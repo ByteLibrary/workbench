@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 # Shared settings and helpers for the setup scripts. Sourced, not executed.
+# The settings are used by the scripts that source this file, which shellcheck cannot see from here.
+# shellcheck disable=SC2034
 set -euo pipefail
 
 ORGANIZATION="ByteLibrary"
