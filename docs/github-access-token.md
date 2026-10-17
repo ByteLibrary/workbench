@@ -49,26 +49,31 @@ Generate new token**
 | Field | Value |
 |---|---|
 | Token name | `bytelibrary-<machine>-cli`, e.g. `bytelibrary-wsl-cli` |
-| Description | `GitHub CLI and git on my <machine> development machine. Creates and manages ByteLibrary repositories, pushes commits and opens pull requests. Scoped to the ByteLibrary organization only.` |
+| Description | `GitHub CLI and git on my <machine> development machine. Pushes commits, opens pull requests and updates issues in ByteLibrary repositories. Scoped to the ByteLibrary organization only.` |
 | **Resource owner** | **`ByteLibrary`**. Set this first: it defaults to your personal account. |
 | Expiration | 90 days |
 | Repository access | All repositories. With ByteLibrary as resource owner, this means all *ByteLibrary* repositories, and it is required to create new ones. |
 
 **Repository permissions:**
 
-| Permission | Access | Needed for | Who |
-|---|---|---|---|
-| Contents | Read and write | Cloning and pushing | Everyone |
-| Pull requests | Read and write | Opening and updating pull requests | Everyone |
-| Issues | Read and write | Tracking work in issues | Everyone |
-| Workflows | Read and write | Pushing files under `.github/workflows/` | Everyone |
-| Metadata | Read | Added automatically | Everyone |
-| Administration | Read and write | Creating repositories, changing descriptions, topics and settings | Owners and maintainers only |
+| Permission | Access | Needed for |
+|---|---|---|
+| Contents | Read and write | Cloning and pushing |
+| Pull requests | Read and write | Opening and updating pull requests |
+| Issues | Read and write | Creating issues and keeping them up to date |
+| Workflows | Read and write | Pushing files under `.github/workflows/` |
+| Metadata | Read | Added automatically |
 
-Request only what your role needs. Without Administration you can still do all day-to-day work;
-new repositories are then created by an owner.
+**Organization permissions:**
 
-**Organization permissions:** none.
+| Permission | Access | Needed for |
+|---|---|---|
+| Projects | Read and write | Updating issue status on the organization project board. Agents must keep the status of their issues current. |
+
+Leave every other organization permission at *No access*.
+
+> **Note:** at the time of writing, a token's permissions cannot be changed after it is created. To
+> change them, create a new token and delete the old one.
 
 Copy the token when it is shown; GitHub shows it only once. Use one token per machine, so a lost
 machine means revoking one token.
