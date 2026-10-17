@@ -34,6 +34,28 @@ workspace_identity_set() {
 
 no_global_github_helper() { ! git config --global --get-all credential.https://github.com.helper; }
 
+# Prints "ok", "drift" or "unreadable" (merge settings are only visible with administration access).
+merge_settings_state() {
+  gh_scoped api "repos/$ORGANIZATION/$1" --jq '
+    if .allow_squash_merge == null then "unreadable"
+    elif .allow_squash_merge and (.allow_merge_commit | not) and (.allow_rebase_merge | not)
+      and .squash_merge_commit_title == "PR_TITLE" and .squash_merge_commit_message == "PR_BODY"
+      and .delete_branch_on_merge then "ok"
+    else "drift" end'
+}
+
+check_repository_settings() {
+  local name state
+  while read -r name; do
+    state="$(merge_settings_state "$name")"
+    case "$state" in
+      ok) ok "$name: repository settings" ;;
+      unreadable) info "$name: repository settings not visible without administration access" ;;
+      *) warn "$name: repository settings differ from the handbook"; failures=$((failures + 1)) ;;
+    esac
+  done < <(convention_repositories)
+}
+
 info "Tools"
 check "git is installed" command -v git
 check "gh is installed" command -v gh
@@ -47,6 +69,9 @@ check "token reaches no private repositories outside $ORGANIZATION" token_limite
 check "workspace repositories authenticate with the workspace token" workspace_uses_token
 check "workspace commit identity is set" workspace_identity_set
 check "GitHub credentials are not configured outside the workspace" no_global_github_helper
+
+info "Repository settings"
+check_repository_settings
 
 info "Workspace"
 check "workspace AGENTS.md exists" test -f "$WORKSPACE_DIR/AGENTS.md"

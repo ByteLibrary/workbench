@@ -59,8 +59,11 @@ Every script is safe to run again.
 | Command | Does |
 |---|---|
 | `./setup.sh` | Full setup |
-| `scripts/doctor.sh` | Checks tools, GitHub access and workspace |
+| `scripts/doctor.sh` | Checks tools, GitHub access, repository settings and workspace |
 | `scripts/clone-repositories.sh` | Clones repositories added to the organization since the last run |
+
+Scripts that work on every repository only include repositories that follow the handbook's
+conventions, identified by a kind topic (see the handbook's repository conventions).
 | `scripts/write-workspace-files.sh` | Rewrites the workspace `AGENTS.md` and `mise.toml` after they change here |
 
 ## Troubleshooting
@@ -69,6 +72,7 @@ Every script is safe to run again.
 |---|---|
 | `gh` says you are not logged in inside the workspace | Your shell does not have `GH_CONFIG_DIR` set. Check that mise is activated in `~/.bashrc` and run `mise trust ~/ByteLibrary/mise.toml`. |
 | The token check finds private repositories outside ByteLibrary | The token's resource owner is wrong. Delete it and create a new one with ByteLibrary as resource owner. |
+| The doctor reports that repository settings differ | An owner applies the repository settings from the handbook's repository conventions to that repository. |
 | `git push` asks for a password | The repository is outside `~/ByteLibrary/`, or setup has not run. Run `./setup.sh`. |
 | Docker checks fail | Start the daemon (`sudo service docker start`) and check you are in the `docker` group. |
 | The token expired | Regenerate it (see [docs/github-access-token.md](docs/github-access-token.md#renewing-and-revoking)) and log in again. |
