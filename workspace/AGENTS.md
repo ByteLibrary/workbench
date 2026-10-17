@@ -6,12 +6,12 @@ separate repository of the ByteLibrary GitHub organization, named exactly like i
 Written by `development-environment/scripts/write-workspace-files.sh`. Change it there, not here.
 
 ## Start here
-- `organization-handbook/` is the source of truth for domain, architecture, decisions and
+- `handbook/` is the source of truth for domain, architecture, decisions and
   conventions. Read its `AGENTS.md` and `llms.txt` before working in any repository.
 - Each repository has its own `AGENTS.md` with repository-specific instructions.
 
 ## Strict rules
-The strict rules in `organization-handbook/AGENTS.md` apply everywhere, in particular:
+The strict rules in `handbook/AGENTS.md` apply everywhere, in particular:
 - Never add co-author trailers or any agent or tool attribution.
 - Never name a specific AI agent, assistant or AI vendor in anything you write.
 

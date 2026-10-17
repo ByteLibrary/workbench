@@ -10,7 +10,7 @@ ok "mise.toml and AGENTS.md"
 
 # Agent tools that need their own instruction file get the same compatibility pointers the
 # handbook uses (ADR-0017): any top-level file whose only content is "@AGENTS.md".
-handbook="$WORKSPACE_DIR/organization-handbook"
+handbook="$WORKSPACE_DIR/handbook"
 if [[ -d "$handbook" ]]; then
   for file in "$handbook"/*.md; do
     if [[ "$(basename "$file")" != "AGENTS.md" && "$(cat "$file")" == "@AGENTS.md" ]]; then
@@ -19,7 +19,7 @@ if [[ -d "$handbook" ]]; then
     fi
   done
 else
-  warn "organization-handbook is not cloned; skipped agent instruction pointers"
+  warn "handbook is not cloned; skipped agent instruction pointers"
 fi
 
 if command -v mise >/dev/null; then

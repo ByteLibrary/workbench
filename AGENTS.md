@@ -1,7 +1,7 @@
 # Agent guide: development-environment
 
 Bash scripts that set up a ByteLibrary workspace. Organization-wide rules and conventions are in the
-[organization handbook](https://github.com/ByteLibrary/organization-handbook); read its `AGENTS.md`
+[organization handbook](https://github.com/ByteLibrary/handbook); read its `AGENTS.md`
 first. Its strict rules apply here.
 
 ## This repository
