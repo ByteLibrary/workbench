@@ -8,6 +8,8 @@ ORGANIZATION="ByteLibrary"
 WORKSPACE_DIR="${BYTELIBRARY_WORKSPACE_DIR:-$HOME/ByteLibrary}"
 GH_CONFIG_DIR_SCOPED="${BYTELIBRARY_GH_CONFIG_DIR:-$HOME/.config/gh-bytelibrary}"
 WORKSPACE_GITCONFIG="$HOME/.gitconfig-bytelibrary"
+HANDBOOK_DATA_DIR="${BYTELIBRARY_HANDBOOK_DATA_DIR:-$WORKSPACE_DIR/handbook/data}"
+PROJECT_NUMBER=1
 REPOSITORY_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 info() { printf '\033[34m==>\033[0m %s\n' "$*"; }
@@ -24,12 +26,20 @@ confirm() {
 # gh, always with the ByteLibrary-only login.
 gh_scoped() { GH_CONFIG_DIR="$GH_CONFIG_DIR_SCOPED" gh "$@"; }
 
-# Kind topics from the handbook's repository conventions. Only repositories with one of them follow the
-# conventions; scripts that work on "every repository" ignore all others.
-KIND_TOPICS='"service","worker","library","template","application","documentation","infrastructure","tooling","planning"'
+# Facts from the handbook's data tables (see handbook_data.py). Uses the handbook's own environment, which
+# has the pinned YAML library, once it exists; the system Python until then.
+handbook_data() {
+  local python=python3
+  [[ -x "$WORKSPACE_DIR/handbook/.venv/bin/python" ]] && python="$WORKSPACE_DIR/handbook/.venv/bin/python"
+  [[ -d "$HANDBOOK_DATA_DIR" ]] || fail "The handbook's data is missing: $HANDBOOK_DATA_DIR"
+  "$python" "$REPOSITORY_DIR/scripts/handbook_data.py" "$HANDBOOK_DATA_DIR" "$1"
+}
 
-# Prints the names of the non-archived repositories that follow the conventions.
+# Prints the names of the non-archived repositories that follow the conventions: those with a kind topic
+# from the handbook's repository kinds. Scripts that work on "every repository" ignore all others.
 convention_repositories() {
+  local kinds
+  kinds="$(handbook_data kinds | sed 's/.*/"&"/' | paste -sd, -)"
   gh_scoped api --paginate "orgs/$ORGANIZATION/repos?per_page=100" \
-    --jq ".[] | select((.archived | not) and any(.topics[]; IN($KIND_TOPICS))) | .name"
+    --jq ".[] | select((.archived | not) and any(.topics[]; IN($kinds))) | .name"
 }
