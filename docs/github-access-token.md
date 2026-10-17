@@ -68,7 +68,16 @@ Generate new token**
 Request only what your role needs. Without Administration you can still do all day-to-day work;
 new repositories are then created by an owner.
 
-**Organization permissions:** none.
+**Organization permissions:**
+
+| Permission | Access | Needed for | Who |
+|---|---|---|---|
+| Projects | Read and write | Updating issue status on the organization project board. Agents must keep the status of their issues current. | Everyone |
+
+Leave every other organization permission at *No access*.
+
+Adding a permission to an existing token: open it, change its permissions and save. If the
+organization requires approval, the change must be approved again.
 
 Copy the token when it is shown; GitHub shows it only once. Use one token per machine, so a lost
 machine means revoking one token.
