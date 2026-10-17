@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
-# Clones every non-archived ByteLibrary repository that is not in the workspace yet.
+# Clones every repository that follows the conventions and is not in the workspace yet.
 source "$(dirname "$0")/lib.sh"
 
 info "Cloning $ORGANIZATION repositories into $WORKSPACE_DIR"
 mkdir -p "$WORKSPACE_DIR"
 
-gh_scoped repo list "$ORGANIZATION" --limit 1000 --no-archived --json name --jq '.[].name' |
+convention_repositories |
   while read -r name; do
     if [[ -d "$WORKSPACE_DIR/$name/.git" ]]; then
       ok "$name (already cloned)"

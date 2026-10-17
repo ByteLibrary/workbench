@@ -21,3 +21,13 @@ confirm() {
 
 # gh, always with the ByteLibrary-only login.
 gh_scoped() { GH_CONFIG_DIR="$GH_CONFIG_DIR_SCOPED" gh "$@"; }
+
+# Kind topics from the handbook's repository conventions. Only repositories with one of them follow the
+# conventions; scripts that work on "every repository" ignore all others.
+KIND_TOPICS='"service","worker","library","template","application","documentation","infrastructure","tooling","planning"'
+
+# Prints the names of the non-archived repositories that follow the conventions.
+convention_repositories() {
+  gh_scoped api --paginate "orgs/$ORGANIZATION/repos?per_page=100" \
+    --jq ".[] | select((.archived | not) and any(.topics[]; IN($KIND_TOPICS))) | .name"
+}
