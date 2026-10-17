@@ -44,6 +44,75 @@ merge_settings_state() {
     else "drift" end'
 }
 
+drift() {
+  warn "$1"
+  failures=$((failures + 1))
+}
+
+# Compares the handbook's data/repositories.yaml with GitHub, in both directions.
+check_repositories_match_handbook() {
+  local -A visibility=() description=() topics=() documented=()
+  local name status vis kind context language desc tops expected problems kinds topic
+  local separator=$'\x1f'
+  while IFS="$separator" read -r name vis desc tops; do
+    visibility[$name]="$vis"
+    description[$name]="$desc"
+    topics[$name]="$tops"
+  done < <(gh_scoped api --paginate "orgs/$ORGANIZATION/repos?per_page=100" \
+    --jq '.[] | select(.archived | not) | [.name, .visibility, (.description // ""), (.topics | sort | join(","))] | join("\u001f")')
+
+  while IFS="$separator" read -r name status vis kind context language desc; do
+    documented[$name]=1
+    if [[ "$status" == planned ]]; then
+      [[ -z "${visibility[$name]+set}" ]] || drift "$name exists on GitHub but is planned in the handbook"
+      continue
+    fi
+    if [[ -z "${visibility[$name]+set}" ]]; then
+      drift "$name is active in the handbook but does not exist on GitHub"
+      continue
+    fi
+    problems=()
+    [[ "${visibility[$name]}" == "$vis" ]] || problems+=("visibility is ${visibility[$name]}, the handbook says $vis")
+    [[ "${description[$name]}" == "$desc" ]] || problems+=("description differs from the handbook")
+    expected="$(printf '%s\n' "$kind" ${context:+"context-$context"} ${language:+"language-$language"} | sort | paste -sd, -)"
+    [[ "${topics[$name]}" == "$expected" ]] || problems+=("topics are '${topics[$name]}', the handbook implies '$expected'")
+    if ((${#problems[@]} > 0)); then
+      drift "$name: $(printf '%s; ' "${problems[@]}" | sed 's/; $//')"
+    else
+      ok "$name matches its entry in the handbook"
+    fi
+  done < <(handbook_data repositories)
+
+  kinds=" $(handbook_data kinds | tr '\n' ' ')"
+  for name in "${!topics[@]}"; do
+    [[ -z "${documented[$name]+set}" ]] || continue
+    for topic in ${topics[$name]//,/ }; do
+      if [[ "$kinds" == *" $topic "* ]]; then
+        drift "$name follows the conventions on GitHub but is missing from the handbook"
+        break
+      fi
+    done
+  done
+}
+
+# Compares the project's Context options with the handbook's contexts (plus "organization").
+check_contexts_match_project() {
+  local expected actual missing extra
+  expected="$( (handbook_data contexts; echo organization) | sort)"
+  actual="$(gh_scoped api graphql -F number="$PROJECT_NUMBER" -f organization="$ORGANIZATION" -f query='
+    query($organization: String!, $number: Int!) {
+      organization(login: $organization) { projectV2(number: $number) { field(name: "Context") {
+        ... on ProjectV2SingleSelectField { options { name } } } } }
+    }' --jq '.data.organization.projectV2.field.options[].name' | sort)"
+  missing="$(comm -23 <(echo "$expected") <(echo "$actual") | paste -sd, -)"
+  extra="$(comm -13 <(echo "$expected") <(echo "$actual") | paste -sd, -)"
+  if [[ -z "$missing$extra" ]]; then
+    ok "project Context options match the handbook's contexts"
+  else
+    drift "project Context options differ from the handbook: missing [${missing}], not in the handbook [${extra}]"
+  fi
+}
+
 check_repository_settings() {
   local name state
   while read -r name; do
@@ -72,6 +141,14 @@ check "GitHub credentials are not configured outside the workspace" no_global_gi
 
 info "Repository settings"
 check_repository_settings
+
+info "Handbook data matches GitHub"
+if [[ -d "$HANDBOOK_DATA_DIR" ]]; then
+  check_repositories_match_handbook
+  check_contexts_match_project
+else
+  drift "the handbook is not cloned, so its data cannot be compared with GitHub"
+fi
 
 info "Workspace"
 check "workspace AGENTS.md exists" test -f "$WORKSPACE_DIR/AGENTS.md"
