@@ -76,8 +76,10 @@ new repositories are then created by an owner.
 
 Leave every other organization permission at *No access*.
 
-Adding a permission to an existing token: open it, change its permissions and save. If the
-organization requires approval, the change must be approved again.
+Adding a permission to an existing token: open it and edit its permissions, if your token page
+offers that. Otherwise create a new token with the full set of permissions, log in with it (step 3)
+and delete the old one. Either way, if the organization requires approval, the token must be
+approved again.
 
 Copy the token when it is shown; GitHub shows it only once. Use one token per machine, so a lost
 machine means revoking one token.
