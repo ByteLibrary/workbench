@@ -2,13 +2,12 @@
 
 Sets up a ByteLibrary development workspace on a new machine: scoped GitHub access, all
 repositories cloned into `~/ByteLibrary/`, workspace-level agent instructions, and a check that
-everything works. Decided in ADR-0018 of the organization handbook.
+everything works. Decided in ADR-0023 and ADR-0026 of the organization handbook.
 
 ```mermaid
 flowchart LR
-  token["1. Create the<br/>organization-only token"] --> login["2. Log in gh with<br/>its own config"]
-  login --> clone["3. Clone this<br/>repository"]
-  clone --> setup["4. ./setup.sh"]
+  clone["1. Clone this<br/>repository"] --> setup["2. ./setup.sh"]
+  setup --> signin["Sign in through the<br/>ByteLibrary Developer Access App"]
   setup --> access["Scope git and gh<br/>to the workspace"]
   setup --> repos["Clone all ByteLibrary<br/>repositories"]
   setup --> files["Write workspace<br/>AGENTS.md and mise.toml"]
@@ -29,16 +28,14 @@ Tested on **Ubuntu on WSL2**.
 Docker Engine runs directly inside WSL2; Docker Desktop is not needed.
 
 ## Setup
-1. **Create the token**, following [docs/github-access-token.md](docs/github-access-token.md).
-2. **Log in** with it, in a ByteLibrary-only `gh` configuration:
+You need a GitHub account that is a member of ByteLibrary.
+
+1. **Clone this repository.** It is public, so no sign-in is needed yet:
    ```bash
-   GH_CONFIG_DIR=~/.config/gh-bytelibrary gh auth login --hostname github.com --git-protocol https
+   git clone https://github.com/ByteLibrary/workbench.git ~/ByteLibrary/workbench
    ```
-3. **Clone this repository:**
-   ```bash
-   GH_CONFIG_DIR=~/.config/gh-bytelibrary gh repo clone ByteLibrary/workbench ~/ByteLibrary/workbench
-   ```
-4. **Run the setup**, and answer its questions:
+2. **Run the setup**, and answer its questions. It signs you in through the ByteLibrary Developer
+   Access App ([docs/github-access.md](docs/github-access.md)):
    ```bash
    ~/ByteLibrary/workbench/setup.sh
    ```
@@ -47,12 +44,13 @@ Docker Engine runs directly inside WSL2; Docker Desktop is not needed.
 
 | Where | Change |
 |---|---|
-| `~/.config/gh-bytelibrary/` | The `gh` login with the ByteLibrary-only token |
+| `~/.config/gh-bytelibrary/` | The `gh` sign-in through the ByteLibrary Developer Access App |
+| `~/.config/bytelibrary/git-credentials` | The same sign-in for git, readable only by you |
 | `~/.gitconfig-bytelibrary` | Commit identity, GitHub credentials and the organization's git hooks (`hooks/`) for ByteLibrary repositories |
 | `~/.gitconfig` | One `includeIf` line that loads the file above only under `~/ByteLibrary/`. With your confirmation, removes machine-wide GitHub credential helpers (a backup is kept). |
 | `~/ByteLibrary/` | All ByteLibrary repositories, plus the workspace `AGENTS.md` and `mise.toml` |
 
-Nothing outside the workspace can use the token.
+Nothing outside the workspace uses the sign-in.
 
 ## Commands
 Every script is safe to run again.
@@ -60,6 +58,7 @@ Every script is safe to run again.
 | Command | Does |
 |---|---|
 | `./setup.sh` | Full setup |
+| `scripts/sign-in.sh` | Signs in through the App again, for example after revoking access |
 | `scripts/doctor.sh` | Checks tools, GitHub access, that the handbook's data matches GitHub, repository settings and workspace |
 | `scripts/clone-repositories.sh` | Clones repositories added to the organization since the last run |
 | `scripts/write-workspace-files.sh` | Rewrites the workspace `AGENTS.md` and `mise.toml` after they change here |
@@ -90,9 +89,9 @@ the rules script from the workspace clone of `reusable-ci-workflows`, the same o
 | Problem | Fix |
 |---|---|
 | `gh` says you are not logged in inside the workspace | Your shell does not have `GH_CONFIG_DIR` set. Check that mise is activated in `~/.bashrc` and run `mise trust ~/ByteLibrary/mise.toml`. |
-| The token check finds private repositories outside ByteLibrary | The token's resource owner is wrong. Delete it and create a new one with ByteLibrary as resource owner. |
+| The doctor says you are not signed in through the App | Run `scripts/sign-in.sh`. If the workspace still uses a personal access token, `setup.sh` offers the switch. |
 | The doctor reports a difference between the handbook's data and GitHub | Decide which one is wrong. Fix the handbook's data through a pull request, or fix GitHub (an owner) so it matches. |
 | The doctor reports that repository settings differ | An owner applies the repository settings from the handbook's repository conventions to that repository. |
 | `git push` asks for a password | The repository is outside `~/ByteLibrary/`, or setup has not run. Run `./setup.sh`. |
 | Docker checks fail | Start the daemon (`sudo service docker start`) and check you are in the `docker` group. |
-| The token expired | Regenerate it (see [docs/github-access-token.md](docs/github-access-token.md#renewing-and-revoking)) and log in again. |
+| git or `gh` is refused after you revoked access | Run `scripts/sign-in.sh`. |
