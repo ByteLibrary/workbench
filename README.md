@@ -50,7 +50,7 @@ Docker Engine runs directly inside WSL2; Docker Desktop is not needed.
 | `~/.config/gh-bytelibrary/` | The `gh` login with the ByteLibrary-only token |
 | `~/.gitconfig-bytelibrary` | Commit identity, GitHub credentials and the organization's git hooks (`hooks/`) for ByteLibrary repositories |
 | `~/.gitconfig` | One `includeIf` line that loads the file above only under `~/ByteLibrary/`. With your confirmation, removes machine-wide GitHub credential helpers (a backup is kept). |
-| `~/ByteLibrary/` | All ByteLibrary repositories, plus the workspace `AGENTS.md` and `mise.toml` |
+| `~/ByteLibrary/` | All ByteLibrary repositories, plus the workspace `AGENTS.md`, `mise.toml` and `ByteLibrary.code-workspace` (opens every repository in VS Code) |
 
 Nothing outside the workspace can use the token.
 
