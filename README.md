@@ -40,6 +40,19 @@ You need a GitHub account that is a member of ByteLibrary.
    ~/ByteLibrary/workbench/setup.sh
    ```
 
+### Without questions
+For CI, setup runs without asking anything when these environment variables are set (see the
+handbook's configuration and secrets convention):
+
+| Variable | Value |
+|---|---|
+| `BYTELIBRARY_GITHUB_TOKEN` | A token to use instead of signing in. It goes to `gh` and to the workspace's git credentials |
+| `BYTELIBRARY_COMMIT_NAME`, `BYTELIBRARY_COMMIT_EMAIL` | The commit identity |
+
+Every question is then answered no, and the doctor skips the checks of a person's sign-in. CI's
+"Setup on a fresh machine" job runs it this way on every pull request, with a one-hour token from the
+ByteLibrary CI App (`CI_APP_ID` and `CI_APP_PRIVATE_KEY`, see [docs/github-access.md](docs/github-access.md)).
+
 ## What the setup changes
 
 | Where | Change |

@@ -23,12 +23,36 @@ fail() { printf '\033[31mERR\033[0m %s\n' "$*" >&2; exit 1; }
 
 confirm() {
   local reply
+  # Without questions, every question is answered no.
+  if non_interactive; then return 1; fi
   read -r -p "$1 [y/N] " reply
   [[ "$reply" =~ ^[Yy]$ ]]
 }
 
-# gh, always with the ByteLibrary-only login.
-gh_scoped() { GH_CONFIG_DIR="$GH_CONFIG_DIR_SCOPED" gh "$@"; }
+# Setup without questions, for CI: a token to use instead of the sign-in, and the commit identity.
+# BYTELIBRARY_GITHUB_TOKEN, BYTELIBRARY_COMMIT_NAME, BYTELIBRARY_COMMIT_EMAIL
+non_interactive() { [[ -n "${BYTELIBRARY_GITHUB_TOKEN:-}" ]]; }
+
+# gh, always with the ByteLibrary-only login, or with the given token without questions.
+gh_scoped() {
+  if non_interactive; then
+    GH_TOKEN="$BYTELIBRARY_GITHUB_TOKEN" gh "$@"
+  else
+    GH_CONFIG_DIR="$GH_CONFIG_DIR_SCOPED" gh "$@"
+  fi
+}
+
+# Stores a token for git, in the workspace credentials file only. Reads the token from standard input.
+store_git_credentials() {
+  local token
+  token="$(cat)"
+  mkdir -p "$(dirname "$GIT_CREDENTIALS_FILE")"
+  (
+    umask 077
+    printf 'protocol=https\nhost=github.com\nusername=x-access-token\npassword=%s\n\n' "$token" |
+      git credential-store --file "$GIT_CREDENTIALS_FILE" store
+  )
+}
 
 # Facts from the handbook's data tables (see handbook_data.py). Uses the handbook's own environment, which
 # has the pinned YAML library, once it exists; the system Python until then.

@@ -30,3 +30,35 @@ jobs:
         env:
           RULES_REPOSITORY: .rules
         run: scripts/test-hooks.sh
+  setup:
+    name: Setup on a fresh machine
+    runs-on: ubuntu-24.04
+    # Pull requests from forks get no secrets, so they cannot create the CI App's token.
+    if: github.event.pull_request.head.repo.full_name == github.repository
+    env:
+      BYTELIBRARY_WORKSPACE_DIR: ${{ github.workspace }}/ByteLibrary
+    steps:
+      - name: Create a token for the ByteLibrary CI App
+        id: token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          app-id: ${{ vars.CI_APP_ID }}
+          private-key: ${{ secrets.CI_APP_PRIVATE_KEY }}
+          owner: ByteLibrary
+      - name: Check out the pull request into the workspace
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          path: ByteLibrary/workbench
+          persist-credentials: false
+      - name: Install the prerequisites from the README
+        run: sudo apt-get install --yes python3-yaml
+      - name: Install mise
+        uses: jdx/mise-action@9b200bcecbfd6303e69a4a261b2e09e3757440a7 # v5.2.0
+        with:
+          install: false
+      - name: Run setup without questions
+        env:
+          BYTELIBRARY_GITHUB_TOKEN: ${{ steps.token.outputs.token }}
+          BYTELIBRARY_COMMIT_NAME: ByteLibrary CI
+          BYTELIBRARY_COMMIT_EMAIL: ci@bytelibrary.invalid
+        run: ByteLibrary/workbench/setup.sh </dev/null
