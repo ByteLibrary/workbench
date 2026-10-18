@@ -36,10 +36,5 @@ done
 [[ -n "$token" ]] || fail "The code expired. Run scripts/sign-in.sh again."
 
 gh_scoped auth login --hostname github.com --git-protocol https --with-token <<<"$token"
-mkdir -p "$(dirname "$GIT_CREDENTIALS_FILE")"
-(
-  umask 077
-  printf 'protocol=https\nhost=github.com\nusername=x-access-token\npassword=%s\n\n' "$token" |
-    git credential-store --file "$GIT_CREDENTIALS_FILE" store
-)
+store_git_credentials <<<"$token"
 ok "Signed in as $(gh_scoped api user --jq .login) through the ByteLibrary Developer Access App"

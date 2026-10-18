@@ -8,7 +8,10 @@ info "Configuring GitHub access for $WORKSPACE_DIR"
 # 1. Sign-in (ADR-0026). gh keeps it in its own configuration directory; git in the workspace credentials.
 app=true
 current="$(gh_scoped auth token 2>/dev/null || true)"
-if [[ "$current" == ghu_* && -s "$GIT_CREDENTIALS_FILE" ]]; then
+if non_interactive; then
+  store_git_credentials <<<"$BYTELIBRARY_GITHUB_TOKEN"
+  ok "Using the given token instead of signing in (no questions)"
+elif [[ "$current" == ghu_* && -s "$GIT_CREDENTIALS_FILE" ]]; then
   ok "Signed in through the ByteLibrary Developer Access App"
 elif [[ -n "$current" && "$current" != ghu_* ]] &&
   ! confirm "The workspace uses a personal access token, which the App sign-in replaces. Sign in through the App now?"; then
@@ -20,7 +23,12 @@ fi
 
 # 2. Commit identity, used only for repositories under the workspace. GitHub's noreply address keeps the
 # personal address out of commits.
-if ! git config --file "$WORKSPACE_GITCONFIG" user.email >/dev/null 2>&1; then
+if non_interactive; then
+  [[ -n "${BYTELIBRARY_COMMIT_NAME:-}" && -n "${BYTELIBRARY_COMMIT_EMAIL:-}" ]] ||
+    fail "Without questions, BYTELIBRARY_COMMIT_NAME and BYTELIBRARY_COMMIT_EMAIL are required"
+  git config --file "$WORKSPACE_GITCONFIG" user.name "$BYTELIBRARY_COMMIT_NAME"
+  git config --file "$WORKSPACE_GITCONFIG" user.email "$BYTELIBRARY_COMMIT_EMAIL"
+elif ! git config --file "$WORKSPACE_GITCONFIG" user.email >/dev/null 2>&1; then
   name="$(git config --global user.name || gh_scoped api user --jq '.name // .login')"
   email="$(gh_scoped api user --jq '"\(.id)+\(.login)@users.noreply.github.com"')"
   read -r -p "Commit name for $ORGANIZATION [$name]: " input && name="${input:-$name}"

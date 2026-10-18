@@ -136,9 +136,13 @@ check "Docker daemon is reachable" docker info
 check "Docker Compose is available" docker compose version
 
 info "GitHub access"
-check "gh is logged in, in its ByteLibrary-only configuration" gh_logged_in
-check "signed in through the ByteLibrary Developer Access App" signed_in_through_app
-check "the sign-in reaches no private repositories outside $ORGANIZATION" token_limited_to_organization
+if non_interactive; then
+  info "Skipped without questions: the checks of a person's sign-in"
+else
+  check "gh is logged in, in its ByteLibrary-only configuration" gh_logged_in
+  check "signed in through the ByteLibrary Developer Access App" signed_in_through_app
+  check "the sign-in reaches no private repositories outside $ORGANIZATION" token_limited_to_organization
+fi
 check "workspace repositories authenticate with the sign-in, from a private file" workspace_uses_sign_in
 check "workspace commit identity is set" workspace_identity_set
 check "GitHub credentials are not configured outside the workspace" no_global_github_helper

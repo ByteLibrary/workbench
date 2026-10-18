@@ -76,7 +76,7 @@ in again.
 
 ## For owners: the CI App
 CI cannot approve a sign-in, so it has its own GitHub App, **ByteLibrary CI**, which acts as itself and
-only reads (ADR-0027 of the organization handbook). Each workflow run creates a token from the App's ID
+only reads (ADR-0027 of the organization handbook). Each workflow run creates a token from the App's Client ID
 and private key with GitHub's `actions/create-github-app-token` action; the token expires after one hour.
 
 **ByteLibrary → Settings → Developer settings → GitHub Apps → ByteLibrary CI.**
@@ -87,7 +87,7 @@ and private key with GitHub's `actions/create-github-app-token` action; the toke
 | Enable Device Flow | Off: nobody signs in to it |
 | Webhook | Inactive |
 | Installed on | ByteLibrary, all repositories |
-| Stored in `workbench` | Actions variable `CI_APP_ID` (the App ID) and Actions secret `CI_APP_PRIVATE_KEY` (the private key) |
+| Stored in `workbench` | Actions variable `CI_APP_CLIENT_ID` (the Client ID) and Actions secret `CI_APP_PRIVATE_KEY` (the private key) |
 
 **Replacing the key:** on the App's settings, generate a new private key, update `CI_APP_PRIVATE_KEY`,
 then delete the old key there.
