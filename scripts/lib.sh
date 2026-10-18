@@ -8,6 +8,10 @@ ORGANIZATION="ByteLibrary"
 WORKSPACE_DIR="${BYTELIBRARY_WORKSPACE_DIR:-$HOME/ByteLibrary}"
 GH_CONFIG_DIR_SCOPED="${BYTELIBRARY_GH_CONFIG_DIR:-$HOME/.config/gh-bytelibrary}"
 WORKSPACE_GITCONFIG="$HOME/.gitconfig-bytelibrary"
+GIT_CREDENTIALS_FILE="${BYTELIBRARY_GIT_CREDENTIALS_FILE:-$HOME/.config/bytelibrary/git-credentials}"
+# The ByteLibrary Developer Access GitHub App that developers sign in through (ADR-0026). Its client ID
+# is public.
+APP_CLIENT_ID="Iv23liYsI5hIzrbCg40q"
 HANDBOOK_DATA_DIR="${BYTELIBRARY_HANDBOOK_DATA_DIR:-$WORKSPACE_DIR/handbook/data}"
 PROJECT_NUMBER=1
 REPOSITORY_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"

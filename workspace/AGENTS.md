@@ -23,7 +23,8 @@ The strict rules in `handbook/AGENTS.md` apply everywhere, in particular:
   Repositories are private unless the user says otherwise.
 
 ## GitHub access
-- `gh` and git use a token that can only access the ByteLibrary organization.
+- `gh` and git use the developer's sign-in through the ByteLibrary Developer Access App, which can only
+  access the ByteLibrary organization.
 - `gh` must run with `GH_CONFIG_DIR=$HOME/.config/gh-bytelibrary`. Interactive shells get it from the
   workspace `mise.toml`; if your shell does not have it set, set it on each `gh` command.
-- git needs nothing extra: repositories under this directory are configured to use the same token.
+- git needs nothing extra: repositories under this directory are configured to use the same sign-in.

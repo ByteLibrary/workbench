@@ -23,9 +23,12 @@ token_limited_to_organization() {
   [[ -z "$outside" ]]
 }
 
-workspace_uses_token() {
-  git -C "$REPOSITORY_DIR" config --get-all credential.https://github.com.helper |
-    grep -qF "GH_CONFIG_DIR=$GH_CONFIG_DIR_SCOPED"
+signed_in_through_app() { [[ "$(gh_scoped auth token)" == ghu_* ]]; }
+
+workspace_uses_sign_in() {
+  [[ -s "$GIT_CREDENTIALS_FILE" && "$(stat -c %a "$GIT_CREDENTIALS_FILE")" == 600 ]] &&
+    git -C "$REPOSITORY_DIR" config --get-all credential.https://github.com.helper |
+    grep -qxF "store --file=$GIT_CREDENTIALS_FILE"
 }
 
 workspace_identity_set() {
@@ -133,9 +136,10 @@ check "Docker daemon is reachable" docker info
 check "Docker Compose is available" docker compose version
 
 info "GitHub access"
-check "gh is logged in with the workspace token" gh_logged_in
-check "token reaches no private repositories outside $ORGANIZATION" token_limited_to_organization
-check "workspace repositories authenticate with the workspace token" workspace_uses_token
+check "gh is logged in, in its ByteLibrary-only configuration" gh_logged_in
+check "signed in through the ByteLibrary Developer Access App" signed_in_through_app
+check "the sign-in reaches no private repositories outside $ORGANIZATION" token_limited_to_organization
+check "workspace repositories authenticate with the sign-in, from a private file" workspace_uses_sign_in
 check "workspace commit identity is set" workspace_identity_set
 check "GitHub credentials are not configured outside the workspace" no_global_github_helper
 

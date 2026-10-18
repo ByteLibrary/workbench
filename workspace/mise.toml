@@ -2,7 +2,7 @@
 # Written by workbench/scripts/write-workspace-files.sh. Change it there, not here.
 
 [env]
-# gh uses the ByteLibrary-only login inside the workspace (docs/github-access-token.md).
+# gh uses the ByteLibrary-only login inside the workspace (docs/github-access.md).
 GH_CONFIG_DIR = "{{env.HOME}}/.config/gh-bytelibrary"
 
 [tools]
