@@ -43,7 +43,7 @@ Your GitHub settings → **Applications** → **Authorized GitHub Apps** →
 
 An owner can cut off everyone at once by suspending or uninstalling the App.
 
-## For owners: the App
+## For owners: the developer App
 **ByteLibrary → Settings → Developer settings → GitHub Apps → ByteLibrary Developer Access.**
 
 | Setting | Value |
@@ -72,21 +72,23 @@ Its permissions are what developers and agents need, and nothing more:
 installation (GitHub sends a request), and every existing token gets the new permissions; nobody signs
 in again.
 
-## For owners: CI
-CI cannot approve a sign-in, so it uses the **`bytelibrary-ci`** account: a member of ByteLibrary,
-not an owner, with two-factor authentication. Its fine-grained personal access token is the only one
-in ByteLibrary:
+## For owners: the CI App
+CI cannot approve a sign-in, so it has its own GitHub App, **ByteLibrary CI**, which acts as itself and
+only reads (ADR-0027 of the organization handbook). Each workflow run creates a token from the App's ID
+and private key with GitHub's `actions/create-github-app-token` action; the token expires after one hour.
 
-| Field | Value |
+**ByteLibrary → Settings → Developer settings → GitHub Apps → ByteLibrary CI.**
+
+| Setting | Value |
 |---|---|
-| Token name | `workbench-ci` |
-| Resource owner | ByteLibrary |
-| Expiration | One year |
-| Repository access | All repositories |
-| Permissions | Contents: Read; organization Projects: Read |
-| Stored as | Secret `SETUP_TOKEN` in `workbench` |
+| Permissions | Contents: Read; Metadata: Read; organization Projects: Read |
+| Enable Device Flow | Off: nobody signs in to it |
+| Webhook | Inactive |
+| Installed on | ByteLibrary, all repositories |
+| Stored in `workbench` | Actions variable `CI_APP_ID` (the App ID) and Actions secret `CI_APP_PRIVATE_KEY` (the private key) |
 
-Before it expires, regenerate it as `bytelibrary-ci` and update the secret.
+**Replacing the key:** on the App's settings, generate a new private key, update `CI_APP_PRIVATE_KEY`,
+then delete the old key there.
 
 ## Moving from a personal access token
 Setup offers the switch when the workspace still uses a personal access token. After signing in, delete
