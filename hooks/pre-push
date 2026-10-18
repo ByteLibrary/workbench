@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+# Checks what is pushed against the organization's rules (ADR-0024): nothing is pushed to or deletes
+# `main`, and branch names follow the convention. Applied to every workspace repository by
+# scripts/configure-git-hooks.sh. Skipped with `git push --no-verify`; the main ruleset and CI still apply.
+source "$(dirname "$0")/../scripts/lib.sh"
+source "$(dirname "$0")/rules.sh"
+
+zero="0000000000000000000000000000000000000000"
+while read -r _ local_object remote_ref _; do
+  case "$remote_ref" in
+    refs/heads/main)
+      fail "Nothing is pushed to main, and main is never deleted: open a pull request from a branch."
+      ;;
+    refs/heads/*)
+      # Deleting a branch needs no name check.
+      [[ "$local_object" == "$zero" ]] || rules branch "${remote_ref#refs/heads/}"
+      ;;
+  esac
+done

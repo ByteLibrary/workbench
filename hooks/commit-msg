@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Checks a commit message against the organization's rules (ADR-0024). Applied to every workspace
+# repository by scripts/configure-git-hooks.sh. Skipped with `git commit --no-verify`; CI checks again.
+source "$(dirname "$0")/../scripts/lib.sh"
+source "$(dirname "$0")/rules.sh"
+
+message="$(sed '/^# -\{24\} >8 -\{24\}$/,$d' "$1" | grep -v '^#' || true)"
+if [[ -f "$(git rev-parse --git-dir)/MERGE_HEAD" ]]; then
+  # Merge commits keep git's own subject; their message is still checked for attribution and names.
+  rules attribution "The merge commit message" <<<"$message"
+  rules names "The merge commit message" <<<"$message"
+else
+  rules commit-message "$1"
+fi
