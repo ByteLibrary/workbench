@@ -65,6 +65,8 @@ Its permissions are what developers and agents need, and nothing more:
 | Commit statuses | Read | Reading the combined status of a commit |
 | Dependabot alerts | Read | Reading vulnerability alerts for dependencies |
 | Code scanning alerts | Read | Reading code scanning findings |
+| Variables | Read | Reading the Actions variables a workflow gets; variables never hold secrets |
+| Secrets | Read | Seeing which Actions secrets exist and when they changed; their values are never readable |
 | Metadata | Read | Added automatically |
 | Projects (organization) | Read and write | Keeping issue status current on the organization project |
 
