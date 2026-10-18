@@ -1,4 +1,4 @@
-# Agent guide: development-environment
+# Agent guide: workbench
 
 Bash scripts that set up a ByteLibrary workspace. Organization-wide rules and conventions are in the
 [organization handbook](https://github.com/ByteLibrary/handbook); read its `AGENTS.md`

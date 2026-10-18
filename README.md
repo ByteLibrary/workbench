@@ -1,4 +1,4 @@
-# development-environment
+# workbench
 
 Sets up a ByteLibrary development workspace on a new machine: scoped GitHub access, all
 repositories cloned into `~/ByteLibrary/`, workspace-level agent instructions, and a check that
@@ -36,11 +36,11 @@ Docker Engine runs directly inside WSL2; Docker Desktop is not needed.
    ```
 3. **Clone this repository:**
    ```bash
-   GH_CONFIG_DIR=~/.config/gh-bytelibrary gh repo clone ByteLibrary/development-environment ~/ByteLibrary/development-environment
+   GH_CONFIG_DIR=~/.config/gh-bytelibrary gh repo clone ByteLibrary/workbench ~/ByteLibrary/workbench
    ```
 4. **Run the setup**, and answer its questions:
    ```bash
-   ~/ByteLibrary/development-environment/setup.sh
+   ~/ByteLibrary/workbench/setup.sh
    ```
 
 ## What the setup changes
