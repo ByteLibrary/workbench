@@ -7,6 +7,7 @@ command -v gh >/dev/null || fail "gh is required (see README.md, Prerequisites)"
 command -v mise >/dev/null || warn "mise is not installed yet (see README.md, Prerequisites)"
 
 "$REPOSITORY_DIR/scripts/configure-github-access.sh"
+"$REPOSITORY_DIR/scripts/configure-git-hooks.sh"
 "$REPOSITORY_DIR/scripts/clone-repositories.sh"
 "$REPOSITORY_DIR/scripts/write-workspace-files.sh"
 "$REPOSITORY_DIR/scripts/doctor.sh"

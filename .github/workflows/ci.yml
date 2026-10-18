@@ -14,3 +14,19 @@ jobs:
     uses: ByteLibrary/reusable-ci-workflows/.github/workflows/documentation.yml@main
   shell:
     uses: ByteLibrary/reusable-ci-workflows/.github/workflows/shell.yml@main
+  hook-tests:
+    name: Hook tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the pull request
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Check out the rules
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ByteLibrary/reusable-ci-workflows
+          path: .rules
+          persist-credentials: false
+      - name: Test the git hooks
+        env:
+          RULES_REPOSITORY: .rules
+        run: scripts/test-hooks.sh

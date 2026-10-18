@@ -48,7 +48,7 @@ Docker Engine runs directly inside WSL2; Docker Desktop is not needed.
 | Where | Change |
 |---|---|
 | `~/.config/gh-bytelibrary/` | The `gh` login with the ByteLibrary-only token |
-| `~/.gitconfig-bytelibrary` | Commit identity and GitHub credentials for ByteLibrary repositories |
+| `~/.gitconfig-bytelibrary` | Commit identity, GitHub credentials and the organization's git hooks (`hooks/`) for ByteLibrary repositories |
 | `~/.gitconfig` | One `includeIf` line that loads the file above only under `~/ByteLibrary/`. With your confirmation, removes machine-wide GitHub credential helpers (a backup is kept). |
 | `~/ByteLibrary/` | All ByteLibrary repositories, plus the workspace `AGENTS.md` and `mise.toml` |
 
@@ -62,6 +62,9 @@ Every script is safe to run again.
 | `./setup.sh` | Full setup |
 | `scripts/doctor.sh` | Checks tools, GitHub access, that the handbook's data matches GitHub, repository settings and workspace |
 | `scripts/clone-repositories.sh` | Clones repositories added to the organization since the last run |
+| `scripts/write-workspace-files.sh` | Rewrites the workspace `AGENTS.md` and `mise.toml` after they change here |
+| `scripts/configure-git-hooks.sh` | Makes every workspace repository use the organization's git hooks |
+| `scripts/test-hooks.sh` | Tests the git hooks in a throwaway workspace (also run by CI) |
 
 Scripts that work on every repository only include repositories that follow the handbook's
 conventions, identified by a kind topic. The kinds are read from the handbook's
@@ -70,7 +73,17 @@ conventions, identified by a kind topic. The kinds are read from the handbook's
 The doctor compares the handbook's data with GitHub in both directions: every repository in
 `data/repositories.yaml` (existence, visibility, description, topics) and every repository on GitHub
 with a kind topic, plus the project's Context options against `data/contexts.yaml`.
-| `scripts/write-workspace-files.sh` | Rewrites the workspace `AGENTS.md` and `mise.toml` after they change here |
+
+## Git hooks
+Every workspace repository uses the hooks in `hooks/` (ADR-0024 of the organization handbook). They run
+the rules script from the workspace clone of `reusable-ci-workflows`, the same one CI uses:
+
+| Hook | Refuses |
+|---|---|
+| `commit-msg` | A message that is not a Conventional Commit (merge commits keep git's own subject), co-author trailers, attribution, and agent tool or vendor names |
+| `pre-push` | Pushing to or deleting `main`, and branch names that do not follow `<type>/<issue-number>-<short-description>` |
+
+`--no-verify` skips them; CI and, in public repositories, the `main` ruleset still apply.
 
 ## Troubleshooting
 
