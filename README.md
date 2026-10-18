@@ -75,7 +75,7 @@ Every script is safe to run again.
 | `./setup.sh` | Full setup |
 | `mise run update` | Updates the workspace now, as the background update does every 10 minutes |
 | `scripts/sign-in.sh` | Signs in through the App again, for example after revoking access |
-| `scripts/doctor.sh` | Checks tools, GitHub access, that the handbook's data matches GitHub, repository settings and workspace |
+| `scripts/doctor.sh` | Checks tools, GitHub access, that the handbook's data matches GitHub, repository settings, the workspace (every repository uses the git hooks, no checked-out `main` behind GitHub), and shows the latest update report |
 | `scripts/clone-repositories.sh` | Clones repositories added to the organization since the last run |
 | `scripts/write-workspace-files.sh` | Rewrites the workspace `AGENTS.md` and `mise.toml` after they change here |
 | `scripts/configure-git-hooks.sh` | Makes every workspace repository use the organization's git hooks |
