@@ -98,6 +98,34 @@ check_repositories_match_handbook() {
   done
 }
 
+# Every workspace repository uses the organization's git hooks, and no checked-out main is behind
+# GitHub as last fetched by the workspace update.
+check_workspace_repositories() {
+  local directory name branch without_hooks=() behind=()
+  for directory in "$WORKSPACE_DIR"/* "$WORKSPACE_DIR"/.[!.]*; do
+    [[ -d "$directory/.git" ]] || continue
+    name="$(basename "$directory")"
+    if [[ "$(git -C "$directory" config core.hooksPath || true)" != "$REPOSITORY_DIR/hooks" ]]; then
+      without_hooks+=("$name")
+    fi
+    branch="$(git -C "$directory" symbolic-ref --short --quiet HEAD || true)"
+    if [[ "$branch" == main ]] && git -C "$directory" rev-parse --verify --quiet origin/main >/dev/null &&
+      (($(git -C "$directory" rev-list --count main..origin/main) > 0)); then
+      behind+=("$name")
+    fi
+  done
+  if ((${#without_hooks[@]} > 0)); then
+    drift "without the organization's git hooks: ${without_hooks[*]}. Run scripts/configure-git-hooks.sh."
+  else
+    ok "every workspace repository uses the organization's git hooks"
+  fi
+  if ((${#behind[@]} > 0)); then
+    drift "main is behind GitHub in: ${behind[*]}. Run 'mise run update'; .workspace-update.md says why it was not updated."
+  else
+    ok "no checked-out main is behind GitHub"
+  fi
+}
+
 # Compares the project's Context options with the handbook's contexts (plus "organization").
 check_contexts_match_project() {
   local expected actual missing extra
@@ -162,6 +190,7 @@ info "Workspace"
 check "workspace AGENTS.md exists" test -f "$WORKSPACE_DIR/AGENTS.md"
 check "workspace mise.toml exists" test -f "$WORKSPACE_DIR/mise.toml"
 check "handbook is cloned" test -d "$WORKSPACE_DIR/handbook/.git"
+check_workspace_repositories
 
 info "Workspace updates"
 if [[ -s "$UPDATE_REPORT_FILE" ]]; then
