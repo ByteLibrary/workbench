@@ -69,3 +69,13 @@ jobs:
           BYTELIBRARY_COMMIT_NAME: ByteLibrary CI
           BYTELIBRARY_COMMIT_EMAIL: ci@bytelibrary.invalid
         run: ByteLibrary/workbench/setup.sh </dev/null
+  update-tests:
+    name: Update tests
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check out the pull request
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Install the prerequisites from the README
+        run: sudo apt-get install --yes python3-yaml
+      - name: Test the workspace update
+        run: scripts/test-update.sh

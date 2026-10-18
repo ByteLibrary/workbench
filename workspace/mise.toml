@@ -5,6 +5,10 @@
 # gh uses the ByteLibrary-only login inside the workspace (docs/github-access.md).
 GH_CONFIG_DIR = "{{env.HOME}}/.config/gh-bytelibrary"
 
+[tasks.update]
+description = "Update every workspace repository now, as the background update does every 10 minutes"
+run = "workbench/scripts/update.sh"
+
 [tools]
 # Shared tools are added here, with pinned versions, when the first repository needs them:
 # OpenTofu, kubectl, Helm, kind, Buf, Copier. Language toolchains are pinned per repository.

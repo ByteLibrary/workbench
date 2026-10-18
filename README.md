@@ -62,6 +62,8 @@ ByteLibrary CI App (`CI_APP_CLIENT_ID` and `CI_APP_PRIVATE_KEY`, see [docs/githu
 | `~/.gitconfig-bytelibrary` | Commit identity, GitHub credentials and the organization's git hooks (`hooks/`) for ByteLibrary repositories |
 | `~/.gitconfig` | One `includeIf` line that loads the file above only under `~/ByteLibrary/`. With your confirmation, removes machine-wide GitHub credential helpers (a backup is kept). |
 | `~/ByteLibrary/` | All ByteLibrary repositories, plus the workspace `AGENTS.md`, `mise.toml` and `ByteLibrary.code-workspace` (opens every repository in VS Code) |
+| `~/.config/systemd/user/` | `bytelibrary-update.timer` and its service, which update the workspace every 10 minutes |
+| `~/.bashrc` | With your confirmation, one line that shows the update report when a terminal opens |
 
 Nothing outside the workspace uses the sign-in.
 
@@ -71,12 +73,14 @@ Every script is safe to run again.
 | Command | Does |
 |---|---|
 | `./setup.sh` | Full setup |
+| `mise run update` | Updates the workspace now, as the background update does every 10 minutes |
 | `scripts/sign-in.sh` | Signs in through the App again, for example after revoking access |
 | `scripts/doctor.sh` | Checks tools, GitHub access, that the handbook's data matches GitHub, repository settings and workspace |
 | `scripts/clone-repositories.sh` | Clones repositories added to the organization since the last run |
 | `scripts/write-workspace-files.sh` | Rewrites the workspace `AGENTS.md` and `mise.toml` after they change here |
 | `scripts/configure-git-hooks.sh` | Makes every workspace repository use the organization's git hooks |
 | `scripts/test-hooks.sh` | Tests the git hooks in a throwaway workspace (also run by CI) |
+| `scripts/test-update.sh` | Tests the workspace update in a throwaway workspace (also run by CI) |
 
 Scripts that work on every repository only include repositories that follow the handbook's
 conventions, identified by a kind topic. The kinds are read from the handbook's
@@ -85,6 +89,14 @@ conventions, identified by a kind topic. The kinds are read from the handbook's
 The doctor compares the handbook's data with GitHub in both directions: every repository in
 `data/repositories.yaml` (existence, visibility, description, topics) and every repository on GitHub
 with a kind topic, plus the project's Context options against `data/contexts.yaml`.
+
+## Keeping up to date
+Every 10 minutes, `scripts/update.sh` fetches every workspace repository, fast-forwards `main` where it
+is checked out without local changes, and clones new repositories. It never switches branches, stashes,
+rebases, merges, deletes, re-runs setup or uses `sudo`: anything that needs a decision is only reported
+in `~/ByteLibrary/.workspace-update.md`, for example a branch behind `main`. The doctor shows the report,
+and so does a new terminal if you agreed to it during setup. Runs never overlap, and a repository with a
+git operation in progress is skipped until the next run.
 
 ## Git hooks
 Every workspace repository uses the hooks in `hooks/` (ADR-0024 of the organization handbook). They run

@@ -163,6 +163,13 @@ check "workspace AGENTS.md exists" test -f "$WORKSPACE_DIR/AGENTS.md"
 check "workspace mise.toml exists" test -f "$WORKSPACE_DIR/mise.toml"
 check "handbook is cloned" test -d "$WORKSPACE_DIR/handbook/.git"
 
+info "Workspace updates"
+if [[ -s "$UPDATE_REPORT_FILE" ]]; then
+  sed 's/^/    /' "$UPDATE_REPORT_FILE"
+else
+  info "No update has run yet. Run 'mise run update'."
+fi
+
 if ((failures > 0)); then
   fail "$failures check(s) failed. See README.md, Troubleshooting."
 fi
