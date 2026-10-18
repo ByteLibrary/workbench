@@ -51,7 +51,7 @@ handbook's configuration and secrets convention):
 
 Every question is then answered no, and the doctor skips the checks of a person's sign-in. CI's
 "Setup on a fresh machine" job runs it this way on every pull request, with a one-hour token from the
-ByteLibrary CI App (`CI_APP_ID` and `CI_APP_PRIVATE_KEY`, see [docs/github-access.md](docs/github-access.md)).
+ByteLibrary CI App (`CI_APP_CLIENT_ID` and `CI_APP_PRIVATE_KEY`, see [docs/github-access.md](docs/github-access.md)).
 
 ## What the setup changes
 
