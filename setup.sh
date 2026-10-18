@@ -10,4 +10,5 @@ command -v mise >/dev/null || warn "mise is not installed yet (see README.md, Pr
 "$REPOSITORY_DIR/scripts/configure-git-hooks.sh"
 "$REPOSITORY_DIR/scripts/clone-repositories.sh"
 "$REPOSITORY_DIR/scripts/write-workspace-files.sh"
+"$REPOSITORY_DIR/scripts/configure-updates.sh"
 "$REPOSITORY_DIR/scripts/doctor.sh"

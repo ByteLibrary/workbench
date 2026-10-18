@@ -21,6 +21,9 @@ The strict rules in `handbook/AGENTS.md` apply everywhere, in particular:
 - New repositories are created on GitHub first, then cloned here, then filled:
   `gh repo create ByteLibrary/<name> --private ...` followed by `gh repo clone ByteLibrary/<name>`.
   Repositories are private unless the user says otherwise.
+- The workspace updates itself every 10 minutes. `.workspace-update.md` reports what it could not
+  update on its own, such as a branch behind `main`. Read it before starting work; `mise run update`
+  updates immediately.
 
 ## GitHub access
 - `gh` and git use the developer's sign-in through the ByteLibrary Developer Access App, which can only

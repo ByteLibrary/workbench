@@ -8,6 +8,9 @@ ORGANIZATION="ByteLibrary"
 WORKSPACE_DIR="${BYTELIBRARY_WORKSPACE_DIR:-$HOME/ByteLibrary}"
 GH_CONFIG_DIR_SCOPED="${BYTELIBRARY_GH_CONFIG_DIR:-$HOME/.config/gh-bytelibrary}"
 WORKSPACE_GITCONFIG="$HOME/.gitconfig-bytelibrary"
+# The workspace update (scripts/update.sh): its report, which agents read too, and its lock.
+UPDATE_REPORT_FILE="$WORKSPACE_DIR/.workspace-update.md"
+UPDATE_LOCK_FILE="${BYTELIBRARY_UPDATE_LOCK_FILE:-$HOME/.cache/bytelibrary/update.lock}"
 GIT_CREDENTIALS_FILE="${BYTELIBRARY_GIT_CREDENTIALS_FILE:-$HOME/.config/bytelibrary/git-credentials}"
 # The ByteLibrary Developer Access GitHub App that developers sign in through (ADR-0026). Its client ID
 # is public.
