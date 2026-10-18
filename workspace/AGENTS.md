@@ -3,7 +3,7 @@
 This directory is the ByteLibrary workspace. It is **not** a git repository: every subdirectory is a
 separate repository of the ByteLibrary GitHub organization, named exactly like it on GitHub.
 
-Written by `development-environment/scripts/write-workspace-files.sh`. Change it there, not here.
+Written by `workbench/scripts/write-workspace-files.sh`. Change it there, not here.
 
 ## Start here
 - `handbook/` is the source of truth for domain, architecture, decisions and

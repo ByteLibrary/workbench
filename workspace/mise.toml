@@ -1,5 +1,5 @@
 # Workspace-wide settings for ~/ByteLibrary.
-# Written by development-environment/scripts/write-workspace-files.sh. Change it there, not here.
+# Written by workbench/scripts/write-workspace-files.sh. Change it there, not here.
 
 [env]
 # gh uses the ByteLibrary-only login inside the workspace (docs/github-access-token.md).
