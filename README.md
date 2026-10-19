@@ -186,6 +186,21 @@ the rules script from the workspace clone of `reusable-ci-workflows`, the same o
 
 `--no-verify` skips them; CI and, in public repositories, the `main` ruleset still apply.
 
+## Documentation
+<!-- BEGIN GENERATED index:docs · source: the frontmatter of the listed documents · edit the source, then run `mise run docs` -->
+| Document | Covers |
+|---|---|
+| [GitHub access](docs/github-access.md) | How developers and agents sign in through the ByteLibrary Developer Access App, and how CI uses its own App |
+<!-- END GENERATED -->
+
+How the parts are built:
+
+<!-- BEGIN GENERATED parts · source: the first heading and paragraph of each part's README.md · edit the source, then run `mise run docs` -->
+| Part | Covers |
+|---|---|
+| [The doctor](src/doctor/README.md) | Checks the development machine and the workspace, and repairs what is safe to repair. |
+<!-- END GENERATED -->
+
 ## Troubleshooting
 
 | Problem | Fix |

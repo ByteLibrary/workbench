@@ -1,7 +1,8 @@
 # The doctor
 
-Checks the development machine and the workspace, and repairs what is safe to repair. How to run it is in
-its help: `mise run doctor -- --help`. This page is for changing it.
+Checks the development machine and the workspace, and repairs what is safe to repair.
+
+How to run it is in its help, `mise run doctor -- --help`; this page is for changing it.
 
 ## How the parts connect
 The command runs every group of checks, each returning results; with `--fix`, the failed results that

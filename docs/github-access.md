@@ -1,3 +1,11 @@
+---
+title: GitHub access
+summary: How developers and agents sign in through the ByteLibrary Developer Access App, and how CI uses its own App
+order: 1
+status: active
+related: []
+---
+
 # GitHub access
 
 Developers, and the agents working for them, sign in through the **ByteLibrary Developer Access**
