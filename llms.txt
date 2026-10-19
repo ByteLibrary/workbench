@@ -1,0 +1,13 @@
+# workbench
+
+> Creates and configures the development machine: an Ubuntu virtual machine with the tools, sign-in, git
+> hooks, the workspace and its updates, which you reach from your editor over SSH. Decided in ADR-0023,
+> ADR-0026 and ADR-0028 of the handbook.
+
+## Documentation
+- [GitHub access](docs/github-access.md): How developers and agents sign in through the ByteLibrary Developer Access App, and how CI uses its own App
+
+## Parts
+- [The doctor](src/doctor/README.md): Checks the development machine and the workspace, and repairs what is safe to repair.
+
+<!-- Generated from the frontmatter of every document. Edit the documents, then run `mise run docs`. -->

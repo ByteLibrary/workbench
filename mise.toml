@@ -3,6 +3,10 @@
 python = "3.14.8"
 uv = "0.12.23"
 
+[tasks.docs]
+description = "Regenerate the documentation's views and llms.txt, with the shared generator"
+run = "uv run --quiet --frozen --project ../reusable-ci-workflows documentation generate --root ."
+
 [tasks.test]
 description = "Test the git hooks, the workspace update and the doctor"
 run = [
