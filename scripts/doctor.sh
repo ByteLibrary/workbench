@@ -35,9 +35,6 @@ workspace_identity_set() {
   git -C "$REPOSITORY_DIR" config --show-origin user.email | grep -qF "$WORKSPACE_GITCONFIG"
 }
 
-# Multipass shares folders of the developer's computer as sshfs mounts.
-no_host_mounts() { ! findmnt --types fuse.sshfs >/dev/null; }
-
 # A failing connection to a site that is not on the allowlist.
 site_blocked() { ! curl -sS -o /dev/null --max-time 10 https://example.com; }
 no_global_github_helper() { ! git config --global --get-all credential.https://github.com.helper; }
@@ -174,7 +171,13 @@ check "Docker Compose is available" docker compose version
 check "the site allowlist is active" systemctl is-active --quiet bytelibrary-firewall.service bytelibrary-dns.service
 check "an allowed site is reachable (github.com)" curl -fsS -o /dev/null --max-time 15 https://github.com
 check "a site not on the allowlist is blocked (example.com)" site_blocked
-check "no folder of your computer is mounted in the machine" no_host_mounts
+host_mounts="$(findmnt --types fuse.sshfs --noheadings --output TARGET || true)"
+if [[ -z "$host_mounts" ]]; then
+  ok "no folder of your computer is mounted in the machine"
+else
+  warn "folders of your computer are mounted in the machine: $(tr '\n' ' ' <<<"$host_mounts")(multipass umount bytelibrary)"
+  failures=$((failures + 1))
+fi
 recently_blocked="$("$REPOSITORY_DIR/scripts/firewall.sh" blocked | wc -l)"
 if ((recently_blocked > 0)); then
   info "$recently_blocked site(s) were blocked in the last day: scripts/firewall.sh blocked"
