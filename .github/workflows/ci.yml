@@ -74,32 +74,53 @@ jobs:
       - name: Test the workspace update
         run: scripts/test-update.sh
   machine:
-    name: Machine through Multipass
+    name: README on a Linux computer
     runs-on: ubuntu-24.04
+    timeout-minutes: 60
+    # Pull requests from forks get no secrets, so they cannot create the CI App's token.
+    if: github.event.pull_request.head.repo.full_name == github.repository
     steps:
-      - name: Install Multipass
+      - name: Prepare the runner like a developer's computer
         run: |
           sudo snap install multipass
           # The service takes a moment to accept requests after installing.
           for _ in $(seq 30); do sudo multipass version >/dev/null 2>&1 && break; sleep 2; done
-          sudo multipass version
-      - name: Create a machine
-        run: |
           # Docker, preinstalled on the runner, drops forwarded traffic, which would leave the machine
           # without a network; a developer's computer has no such rule.
           sudo iptables -P FORWARD ACCEPT
           # Right after installing, Multipass may not have loaded its image catalogue yet.
           for _ in $(seq 30); do sudo multipass find 24.04 >/dev/null 2>&1 && break; sleep 5; done
-          if ! output="$(sudo multipass launch 24.04 --name ci-machine --cpus 2 --memory 2G --disk 10G --timeout 900 2>&1)"; then
+          # A Linux computer resolves .local names through mDNS.
+          sudo apt-get install --yes --quiet avahi-daemon libnss-mdns
+          mkdir -p "$HOME/.ssh"
+          ssh-keygen -t ed25519 -N "" -q -f "$HOME/.ssh/id_ed25519"
+      - name: "Step 1: create the machine (smaller than the README's, to fit the runner)"
+        run: |
+          if ! output="$(sudo multipass launch 24.04 --name bytelibrary --cpus 2 --memory 4G --disk 20G --timeout 900 2>&1)"; then
             echo "::error title=multipass launch::$(tail -3 <<<"$output" | tr '\n' ' ')"
             exit 1
           fi
-      - name: Announce its name on the local network, as setup does
-        run: sudo multipass exec ci-machine -- sudo apt-get install --yes --quiet avahi-daemon
-      - name: Resolve .local names on the runner, as a Linux computer does
-        run: sudo apt-get install --yes --quiet avahi-daemon libnss-mdns
-      - name: The machine is reachable by name over SSH's port
+      - name: "Step 2: give it the SSH key"
+        run: sudo multipass transfer "$HOME/.ssh/id_ed25519.pub" bytelibrary:/home/ubuntu/editor-ssh-key.pub
+      - name: Create a token for the ByteLibrary CI App
+        id: token
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
+        with:
+          client-id: ${{ vars.CI_APP_CLIENT_ID }}
+          private-key: ${{ secrets.CI_APP_PRIVATE_KEY }}
+          owner: ByteLibrary
+      - name: "Step 3: inside the machine, clone this pull request and run setup without questions"
+        env:
+          TOKEN: ${{ steps.token.outputs.token }}
+          COMMIT: ${{ github.event.pull_request.head.sha }}
         run: |
-          getent hosts ci-machine.local
-          nc -z -w 10 ci-machine.local 22
-          echo "::notice title=Machine by name::ci-machine.local resolves and its SSH port is reachable"
+          sudo multipass exec bytelibrary -- env BYTELIBRARY_GITHUB_TOKEN="$TOKEN" \
+            BYTELIBRARY_COMMIT_NAME="ByteLibrary CI" BYTELIBRARY_COMMIT_EMAIL=ci@bytelibrary.invalid COMMIT="$COMMIT" \
+            bash -c 'git clone --quiet https://github.com/ByteLibrary/workbench.git ~/ByteLibrary/workbench &&
+              git -C ~/ByteLibrary/workbench checkout --quiet "$COMMIT" &&
+              ~/ByteLibrary/workbench/setup.sh </dev/null'
+      - name: "Step 4: connect over SSH to bytelibrary.local, as the editor does"
+        run: |
+          printf 'Host bytelibrary\n  HostName bytelibrary.local\n  User ubuntu\n  StrictHostKeyChecking accept-new\n' >>"$HOME/.ssh/config"
+          ssh bytelibrary 'test -d ~/ByteLibrary/handbook/.git && test -x ~/.local/bin/playbook && docker info >/dev/null'
+          echo "::notice title=README on a Linux computer::Steps 1 to 4 work: the machine is set up, and reached by name over SSH"
