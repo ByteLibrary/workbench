@@ -32,7 +32,7 @@ Run these commands in any terminal; they are the same on every operating system.
    ```
 2. **Give it your SSH key,** so your editor can connect:
    ```
-   cat $HOME/.ssh/id_ed25519.pub | multipass exec bytelibrary -- tee /home/ubuntu/editor-ssh-key.pub
+   multipass exec bytelibrary -- sh -c "echo '$(cat $HOME/.ssh/id_ed25519.pub)' > /home/ubuntu/editor-ssh-key.pub"
    ```
 3. **Set it up.** Open a shell in the machine, clone this repository (it is public) and run setup, which
    asks a few questions and signs you in through the ByteLibrary Developer Access App
