@@ -38,6 +38,8 @@ After=network.target docker.service
 [Service]
 Type=oneshot
 RemainAfterExit=yes
+# Services start without HOME, which the scripts' shared settings use.
+Environment=HOME=/root
 Environment=BYTELIBRARY_PERSONAL_SITES=$personal_sites
 ExecStart=$REPOSITORY_DIR/scripts/firewall.sh apply
 
