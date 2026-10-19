@@ -10,6 +10,8 @@ Examples:
   mise run doctor                       check everything
   mise run doctor -- --fix --dry-run    list the repairs --fix would make
   mise run doctor -- --fix              repair what is safe to repair, then check again
+  mise run doctor -- --skip credentials leave out a group of checks, on a machine that is not a
+                                        development machine
 """
 
 # The system's Python, which has PyYAML (install-system-packages.sh); mise's Python may not.
@@ -642,20 +644,24 @@ def check_workspace() -> Iterator[Result]:
         )
 
 
-CHECKS: list[Callable[[], Iterator[Result]]] = [
-    check_tools,
-    check_firewall,
-    check_credentials,
-    check_ports,
-    check_github_access,
-    check_github_data,
-    check_workspace,
-]
+# Each group of checks, by the name --skip takes.
+CHECKS: dict[str, Callable[[], Iterator[Result]]] = {
+    "tools": check_tools,
+    "firewall": check_firewall,
+    "credentials": check_credentials,
+    "ports": check_ports,
+    "github-access": check_github_access,
+    "github-data": check_github_data,
+    "workspace": check_workspace,
+}
 
 
-def check_everything() -> list[Result]:
+def check_everything(skip: list[str] = ()) -> list[Result]:
     results = []
-    for check in CHECKS:
+    for name, check in CHECKS.items():
+        if name in skip:
+            results.append(Result(name, f"skipped on request (--skip {name})", None))
+            continue
         try:
             results += list(check())
         except Exception as error:  # A broken check is a failure to report, not a crash.
@@ -728,15 +734,28 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--json", action="store_true", help="print the results as one JSON document")
     parser.add_argument("--quiet", action="store_true", help="show only the checks that failed")
     parser.add_argument("--verbose", action="store_true", help="show each command a check runs, on stderr")
+    parser.add_argument(
+        "--skip",
+        action="append",
+        # Setup runs the doctor itself, so CI passes groups to skip through BYTELIBRARY_DOCTOR_SKIP.
+        default=os.environ.get("BYTELIBRARY_DOCTOR_SKIP", "").split(),
+        choices=list(CHECKS),
+        metavar="CHECK",
+        help="leave out a group of checks (repeatable), e.g. on a machine that is not a development machine: "
+        + ", ".join(CHECKS),
+    )
     arguments = parser.parse_args(argv)
+    unknown = sorted(set(arguments.skip) - CHECKS.keys())
+    if unknown:
+        parser.error(f"BYTELIBRARY_DOCTOR_SKIP names unknown checks: {', '.join(unknown)}")
     VERBOSE = arguments.verbose
 
-    results = check_everything()
+    results = check_everything(arguments.skip)
     made = []
     if arguments.fix:
         made = make_repairs(results, arguments.dry_run)
         if made and not arguments.dry_run:
-            results = check_everything()
+            results = check_everything(arguments.skip)
     failures = sum(result.ok is False for result in results)
     if arguments.json:
         document = {"checks": [asdict(result) for result in results], "repairs": made, "failures": failures}

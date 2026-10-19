@@ -205,5 +205,39 @@ class RunTest(unittest.TestCase):
         self.assertIn("Docker daemon is reachable", output)
 
 
+class SkipTest(unittest.TestCase):
+    def test_a_skipped_group_is_not_run_and_is_reported(self) -> None:
+        ran = []
+
+        def group(name):
+            def check():
+                ran.append(name)
+                yield doctor.Result(name, f"{name} check", True)
+
+            return check
+
+        with mock.patch.object(
+            doctor, "CHECKS", {"tools": group("tools"), "credentials": group("credentials")}
+        ):
+            results = doctor.check_everything(["credentials"])
+        self.assertEqual(ran, ["tools"])
+        self.assertEqual(results[1].name, "skipped on request (--skip credentials)")
+        self.assertIsNone(results[1].ok)
+
+    def test_an_unknown_group_is_wrong_usage(self) -> None:
+        with contextlib.redirect_stderr(io.StringIO()), self.assertRaises(SystemExit) as exit:
+            doctor.main(["--skip", "everything"])
+        self.assertEqual(exit.exception.code, 2)
+
+    def test_an_unknown_group_in_the_environment_is_wrong_usage(self) -> None:
+        with (
+            mock.patch.dict(doctor.os.environ, {"BYTELIBRARY_DOCTOR_SKIP": "credentials bogus"}),
+            contextlib.redirect_stderr(io.StringIO()),
+            self.assertRaises(SystemExit) as exit,
+        ):
+            doctor.main([])
+        self.assertEqual(exit.exception.code, 2)
+
+
 if __name__ == "__main__":
     unittest.main()

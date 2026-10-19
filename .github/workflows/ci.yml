@@ -66,6 +66,9 @@ jobs:
           BYTELIBRARY_GITHUB_TOKEN: ${{ steps.token.outputs.token }}
           BYTELIBRARY_COMMIT_NAME: ByteLibrary CI
           BYTELIBRARY_COMMIT_EMAIL: ci@bytelibrary.invalid
+          # The runner is GitHub's build machine, not a development machine: it is logged in to Docker
+          # Hub. README steps runs every check in a fresh development machine.
+          BYTELIBRARY_DOCTOR_SKIP: credentials
         run: |
           # Shows setup's warnings and last line on the pull request when it fails.
           set -o pipefail
