@@ -144,7 +144,7 @@ jobs:
           echo example.com >>~/.config/bytelibrary/allowed-sites
           sleep 5
           expect "a site in the personal file is reachable" "curl -fsS --max-time 15 https://example.com"
-          expect "the doctor reports a stopped firewall" "sudo systemctl stop bytelibrary-firewall.service bytelibrary-dns.service && ! ~/ByteLibrary/workbench/scripts/doctor.sh"
+          expect "the doctor reports a stopped firewall" "sudo systemctl stop bytelibrary-firewall.service bytelibrary-dns.service && ! ~/ByteLibrary/workbench/scripts/doctor.py"
           CHECKS
           )"; then
             echo "$output"

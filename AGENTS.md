@@ -13,4 +13,4 @@ first. Its strict rules apply here.
 - Files in `workspace/` are copied into the workspace root. Keep the workspace `AGENTS.md`
   tool-agnostic and short.
 - When adding a check or a setup step, update the tables in `README.md` in the same change.
-- Verify changes with `bash -n` and, when available, `shellcheck`; then run `scripts/doctor.sh`.
+- Verify changes with `bash -n` and, when available, `shellcheck`; then run `scripts/doctor.py`.

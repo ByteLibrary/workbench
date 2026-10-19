@@ -143,7 +143,7 @@ Every script is safe to run again.
 | `./setup.sh` | Full setup |
 | `mise run update` | Updates the workspace now, as the background update does every 10 minutes |
 | `mise run sign-in` | Signs in through the App again, for example after revoking access |
-| `mise run doctor` | Checks tools, GitHub access, that the handbook's data matches GitHub, repository settings, the workspace (every repository uses the git hooks, no checked-out `main` behind GitHub), and shows the latest update report |
+| `mise run doctor` | Checks tools, Docker, the firewall, credentials, local ports, GitHub access, that the handbook's data matches GitHub, repository settings and the workspace, and shows the latest update report. `mise run doctor -- --fix` repairs what is safe to repair (`--dry-run` first to see what), then checks again |
 | `scripts/clone-repositories.sh` | Clones repositories added to the organization since the last run |
 | `scripts/write-workspace-files.sh` | Rewrites the workspace `AGENTS.md` and `mise.toml` after they change here |
 | `scripts/install-playbook.sh` | Installs the playbook's command and skills again |
