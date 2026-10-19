@@ -53,6 +53,8 @@ Description=Apply the ByteLibrary site allowlist when a sites file changes
 [Path]
 PathChanged=$REPOSITORY_DIR/firewall/allowed-sites.txt
 PathChanged=$personal_sites
+# The network's DNS servers, which the allowlist resolver sends allowed names to.
+PathChanged=/run/systemd/resolve/resolv.conf
 Unit=bytelibrary-firewall.service
 
 [Install]
