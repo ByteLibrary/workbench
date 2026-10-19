@@ -20,7 +20,8 @@ DNS_ADDRESSES="127.0.0.1,${BYTELIBRARY_DOCKER_BRIDGE_ADDRESS:-172.17.0.1}"
 # since the domains are written into configuration that runs as root.
 domains() {
   [[ -f "$1" ]] || return 0
-  sed -e 's/#.*//' -e 's/[[:space:]]//g' "$1" | grep -v '^$' | while read -r domain; do
+  sed -e 's/#.*//' -e 's/[[:space:]]//g' "$1" | while read -r domain; do
+    [[ -n "$domain" ]] || continue
     if [[ ! "$domain" =~ ^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$ ]]; then
       echo "$1: '$domain' is not a domain" >&2
       return 1
