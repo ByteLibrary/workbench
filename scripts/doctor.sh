@@ -1,6 +1,11 @@
 #!/usr/bin/env bash
-# Checks that the workspace is set up correctly. Safe to run at any time.
+# Checks that the development machine and the workspace are set up correctly: tools, Docker, the
+# firewall, GitHub access, the handbook's data against GitHub, repository settings and the workspace
+# files. Says how to fix each problem, and exits with 1 if any check fails. Safe to run at any time.
+#
+# Usage: mise run doctor   (in the workspace; or workbench/scripts/doctor.sh)
 source "$(dirname "$0")/lib.sh"
+handle_help "$@"
 
 failures=0
 check() {
@@ -180,7 +185,7 @@ else
 fi
 recently_blocked="$("$REPOSITORY_DIR/scripts/firewall.sh" blocked | wc -l)"
 if ((recently_blocked > 0)); then
-  info "$recently_blocked site(s) were blocked in the last day: scripts/firewall.sh blocked"
+  info "$recently_blocked site(s) were blocked in the last day: mise run firewall:blocked"
 fi
 
 info "GitHub access"

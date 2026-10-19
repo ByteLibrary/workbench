@@ -3,7 +3,10 @@
 # where it is checked out without local changes, and clones new organization repositories. Everything
 # that needs a decision is only reported, in $UPDATE_REPORT_FILE. Run every 10 minutes by a systemd
 # user timer (scripts/configure-updates.sh), and by `mise run update`.
+#
+# Usage: mise run update   (in the workspace; or workbench/scripts/update.sh)
 source "$(dirname "$0")/lib.sh"
+handle_help "$@"
 
 # One run at a time: a run that finds another one in progress leaves it to finish.
 mkdir -p "$(dirname "$UPDATE_LOCK_FILE")"
@@ -41,7 +44,7 @@ update_repository() {
     return
   fi
   if ! git -C "$directory" fetch --quiet --prune origin 2>/dev/null; then
-    note "$name: could not fetch from GitHub; check the sign-in with scripts/doctor.sh"
+    note "$name: could not fetch from GitHub; check the sign-in with mise run doctor"
     return
   fi
   git -C "$directory" rev-parse --verify --quiet origin/main >/dev/null || return 0
@@ -96,7 +99,7 @@ if cloned="$("$REPOSITORY_DIR/scripts/clone-repositories.sh" 2>/dev/null)"; then
     fi
   fi
 else
-  note "could not list the organization's repositories; check the sign-in with scripts/doctor.sh"
+  note "could not list the organization's repositories; check the sign-in with mise run doctor"
 fi
 
 {

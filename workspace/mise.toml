@@ -9,6 +9,22 @@ GH_CONFIG_DIR = "{{env.HOME}}/.config/gh-bytelibrary"
 description = "Update every workspace repository now, as the background update does every 10 minutes"
 run = "workbench/scripts/update.sh"
 
+[tasks.doctor]
+description = "Check tools, GitHub access, the firewall, the handbook's data against GitHub and the workspace"
+run = "workbench/scripts/doctor.sh"
+
+[tasks.sign-in]
+description = "Sign in through the ByteLibrary Developer Access App again, for example after revoking access"
+run = "workbench/scripts/sign-in.sh"
+
+[tasks."firewall:blocked"]
+description = "List the sites the firewall refused in the last day"
+run = "workbench/scripts/firewall.sh blocked"
+
+[tasks."firewall:apply"]
+description = "Apply the sites files now; it also happens on its own when they change"
+run = "workbench/scripts/firewall.sh apply"
+
 [tools]
 # Only what the workspace itself needs (ADR-0028). Tools a repository builds, tests or lints with are
 # pinned in that repository's mise.toml, so its CI uses the same versions.

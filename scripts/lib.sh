@@ -32,6 +32,14 @@ ok()   { printf '\033[32m ok\033[0m %s\n' "$*"; }
 warn() { printf '\033[33m !!\033[0m %s\n' "$*" >&2; }
 fail() { printf '\033[31mERR\033[0m %s\n' "$*" >&2; exit 1; }
 
+# Prints the calling script's header comment as its help, and exits, when asked with -h or --help.
+handle_help() {
+  if [[ "${1:-}" == "-h" || "${1:-}" == "--help" ]]; then
+    sed -n '2,/^[^#]/{/^#/s/^# \{0,1\}//p}' "$0"
+    exit 0
+  fi
+}
+
 confirm() {
   local reply
   # Without questions, every question is answered no.
