@@ -3,13 +3,14 @@
 # (dnsmasq) answers only for the allowed domains and adds each address it returns to a firewall set
 # (nftables); other outgoing traffic, from the machine and from containers, is refused.
 #
-# Usage:
+# Usage (in the workspace, `mise run firewall:apply` and `mise run firewall:blocked`):
 #   firewall.sh apply     applies firewall/allowed-sites.txt and the personal file (runs with sudo)
 #   firewall.sh blocked   lists the domains refused in the last day
 #
 # The personal file is ~/.config/bytelibrary/allowed-sites, one domain per line. A systemd path unit
 # runs `apply` whenever either file changes, so editing them is enough.
 source "$(dirname "$0")/lib.sh"
+handle_help "$@"
 
 SHARED_SITES="$REPOSITORY_DIR/firewall/allowed-sites.txt"
 PERSONAL_SITES="${BYTELIBRARY_PERSONAL_SITES:-$HOME/.config/bytelibrary/allowed-sites}"

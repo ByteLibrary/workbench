@@ -124,7 +124,7 @@ doctor reports it.
 A site that is not on the list fails as if it did not exist. To see what was refused:
 
 ```bash
-scripts/firewall.sh blocked
+mise run firewall:blocked
 ```
 
 To allow a site, add the domain (it covers its subdomains) to:
@@ -142,14 +142,14 @@ Every script is safe to run again.
 |---|---|
 | `./setup.sh` | Full setup |
 | `mise run update` | Updates the workspace now, as the background update does every 10 minutes |
-| `scripts/sign-in.sh` | Signs in through the App again, for example after revoking access |
-| `scripts/doctor.sh` | Checks tools, GitHub access, that the handbook's data matches GitHub, repository settings, the workspace (every repository uses the git hooks, no checked-out `main` behind GitHub), and shows the latest update report |
+| `mise run sign-in` | Signs in through the App again, for example after revoking access |
+| `mise run doctor` | Checks tools, GitHub access, that the handbook's data matches GitHub, repository settings, the workspace (every repository uses the git hooks, no checked-out `main` behind GitHub), and shows the latest update report |
 | `scripts/clone-repositories.sh` | Clones repositories added to the organization since the last run |
 | `scripts/write-workspace-files.sh` | Rewrites the workspace `AGENTS.md` and `mise.toml` after they change here |
 | `scripts/install-playbook.sh` | Installs the playbook's command and skills again |
 | `scripts/configure-git-hooks.sh` | Makes every workspace repository use the organization's git hooks |
-| `scripts/firewall.sh blocked` | Lists the sites the firewall refused in the last day |
-| `scripts/firewall.sh apply` | Applies the sites files now; it also happens on its own when they change |
+| `mise run firewall:blocked` | Lists the sites the firewall refused in the last day |
+| `mise run firewall:apply` | Applies the sites files now; it also happens on its own when they change |
 | `mise run test` | Tests the git hooks and the workspace update in throwaway workspaces, as the `Tests` check does |
 
 Scripts that work on every repository only include repositories that follow the handbook's
@@ -191,10 +191,10 @@ the rules script from the workspace clone of `reusable-ci-workflows`, the same o
 | Problem | Fix |
 |---|---|
 | `gh` says you are not logged in inside the workspace | Your shell does not have `GH_CONFIG_DIR` set. Check that mise is activated in `~/.bashrc` and run `mise trust ~/ByteLibrary/mise.toml`. |
-| The doctor says you are not signed in through the App | Run `scripts/sign-in.sh`. If the workspace still uses a personal access token, `setup.sh` offers the switch. |
+| The doctor says you are not signed in through the App | Run `mise run sign-in`. If the workspace still uses a personal access token, `setup.sh` offers the switch. |
 | The doctor reports a difference between the handbook's data and GitHub | Decide which one is wrong. Fix the handbook's data through a pull request, or fix GitHub (an owner) so it matches. |
 | The doctor reports that repository settings differ | An owner applies the repository settings from the handbook's repository conventions to that repository. |
 | `git push` asks for a password | The repository is outside `~/ByteLibrary/`, or setup has not run. Run `./setup.sh`. |
 | Docker checks fail | Reconnect to the machine: being added to the `docker` group only applies to new sessions. If it still fails, `sudo systemctl start docker`. |
 | The editor does not find `bytelibrary.local` | Check the machine is running (`multipass list`). On Linux, your computer resolves `.local` names through mDNS, usually already installed (`libnss-mdns`). |
-| git or `gh` is refused after you revoked access | Run `scripts/sign-in.sh`. |
+| git or `gh` is refused after you revoked access | Run `mise run sign-in`. |

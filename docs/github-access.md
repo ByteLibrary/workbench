@@ -24,7 +24,7 @@ shows that they went through the App.
 
 ## Signing in
 `setup.sh` signs you in. It prints a code; open <https://github.com/login/device>, enter the code and
-approve **ByteLibrary Developer Access**. Run `scripts/sign-in.sh` to sign in again at any time, for
+approve **ByteLibrary Developer Access**. Run `mise run sign-in` to sign in again at any time, for
 example after revoking access.
 
 The token is kept in two places, and used only inside the workspace:

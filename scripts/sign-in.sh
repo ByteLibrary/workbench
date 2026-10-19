@@ -2,7 +2,10 @@
 # Signs the developer in through the ByteLibrary Developer Access App (ADR-0026, docs/github-access.md):
 # the developer approves a code on GitHub, and the token goes to gh, in its ByteLibrary-only
 # configuration, and to git, in the workspace credentials. The token is never printed.
+#
+# Usage: mise run sign-in   (in the workspace; or workbench/scripts/sign-in.sh)
 source "$(dirname "$0")/lib.sh"
+handle_help "$@"
 
 command -v curl >/dev/null || fail "curl is required"
 
@@ -33,7 +36,7 @@ while ((SECONDS < deadline)); do
     *) fail "The sign-in stopped: $(field error_description <<<"$response")" ;;
   esac
 done
-[[ -n "$token" ]] || fail "The code expired. Run scripts/sign-in.sh again."
+[[ -n "$token" ]] || fail "The code expired. Run mise run sign-in again."
 
 gh_scoped auth login --hostname github.com --git-protocol https --with-token <<<"$token"
 store_git_credentials <<<"$token"

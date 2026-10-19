@@ -16,7 +16,7 @@ elif [[ "$current" == ghu_* && -s "$GIT_CREDENTIALS_FILE" ]]; then
 elif [[ -n "$current" && "$current" != ghu_* ]] &&
   ! confirm "The workspace uses a personal access token, which the App sign-in replaces. Sign in through the App now?"; then
   app=false
-  warn "Kept the personal access token. Run scripts/sign-in.sh to switch later."
+  warn "Kept the personal access token. Run mise run sign-in to switch later."
 else
   "$REPOSITORY_DIR/scripts/sign-in.sh"
 fi

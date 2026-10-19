@@ -93,4 +93,4 @@ if write_system_file "$docker_config" <<<"$docker_dns"; then
   sudo systemctl restart docker
 fi
 
-ok "Firewall: only allowed sites are reachable (scripts/firewall.sh blocked shows what was refused)"
+ok "Firewall: only allowed sites are reachable (mise run firewall:blocked shows what was refused)"
