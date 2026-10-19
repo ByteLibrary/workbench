@@ -6,6 +6,7 @@ source "$(dirname "$0")/scripts/lib.sh"
 mkdir -p "$WORKSPACE_DIR" && cd "$WORKSPACE_DIR"
 
 "$REPOSITORY_DIR/scripts/install-system-packages.sh"
+"$REPOSITORY_DIR/scripts/authorize-ssh-key.sh"
 "$REPOSITORY_DIR/scripts/write-workspace-files.sh"
 "$REPOSITORY_DIR/scripts/install-tools.sh"
 "$REPOSITORY_DIR/scripts/configure-github-access.sh"

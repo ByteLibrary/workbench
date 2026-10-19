@@ -1,41 +1,83 @@
 # workbench
 
-Sets up a development workspace on a new machine: scoped GitHub access, all
-repositories cloned into `~/ByteLibrary/`, workspace-level agent instructions, and a check that
-everything works. Decided in ADR-0023 and ADR-0026 of the handbook.
+Creates and configures the development machine: an Ubuntu virtual machine with the tools, sign-in, git
+hooks, the workspace and its updates, which you reach from your editor over SSH. Decided in ADR-0023,
+ADR-0026 and ADR-0028 of the handbook.
 
 ```mermaid
 flowchart LR
-  clone["1. Clone this<br/>repository"] --> setup["2. ./setup.sh"]
-  setup --> signin["Sign in through the<br/>ByteLibrary Developer Access App"]
-  setup --> access["Scope git and gh<br/>to the workspace"]
-  setup --> repos["Clone all<br/>repositories"]
-  setup --> files["Write workspace<br/>AGENTS.md and mise.toml"]
-  setup --> doctor["Run the doctor check"]
+  launch["1. Create the machine<br/>(Multipass)"] --> key["2. Give it your<br/>SSH key"]
+  key --> setup["3. Inside it: clone<br/>and run setup.sh"]
+  setup --> editor["4. Connect your editor<br/>to bytelibrary.local"]
 ```
 
 ## Prerequisites
-Setup runs inside the development machine: Ubuntu 24.04, with `sudo`. It installs everything else
-itself, at versions pinned in git:
+**Windows only:** enable Hyper-V. Run this in PowerShell as administrator, then restart:
+```powershell
+Enable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V -All
+```
+
+**Everyone:**
+1. [Multipass](https://canonical.com/multipass/install).
+2. An SSH key: if `$HOME/.ssh/id_ed25519.pub` does not exist, run `ssh-keygen -t ed25519`.
+3. An editor that works over SSH (see [Editors](#editors)).
+4. A GitHub account that is a member of ByteLibrary.
+
+## Setup
+Run these commands in any terminal; they are the same on every operating system.
+
+1. **Create the machine.** Adjust the size to your computer; this leaves room for services and agents:
+   ```
+   multipass launch 24.04 --name bytelibrary --cpus 6 --memory 12G --disk 60G
+   ```
+2. **Give it your SSH key,** so your editor can connect:
+   ```
+   multipass transfer $HOME/.ssh/id_ed25519.pub bytelibrary:/home/ubuntu/editor-ssh-key.pub
+   ```
+3. **Set it up.** Open a shell in the machine, clone this repository (it is public) and run setup, which
+   asks a few questions and signs you in through the ByteLibrary Developer Access App
+   ([docs/github-access.md](docs/github-access.md)):
+   ```
+   multipass shell bytelibrary
+   git clone https://github.com/ByteLibrary/workbench.git ~/ByteLibrary/workbench
+   ~/ByteLibrary/workbench/setup.sh
+   ```
+4. **Connect your editor.** Add this to `$HOME/.ssh/config` on your computer, then connect to
+   `bytelibrary` from your editor:
+   ```
+   Host bytelibrary
+     HostName bytelibrary.local
+     User ubuntu
+   ```
+   The machine announces its name on the local network, so it is found even when its address changes.
+
+Setup installs everything else itself, at versions pinned in git:
 
 | What | From |
 |---|---|
-| git, curl, CA certificates, Python 3 with PyYAML (for setup's own scripts) | Ubuntu's packages |
+| git, curl, CA certificates, Python 3 with PyYAML (for setup's own scripts), avahi-daemon (announces `bytelibrary.local`) | Ubuntu's packages |
 | Docker Engine, and the `docker` group for you | Docker's repository |
 | mise, then `gh`, Python and ShellCheck for the workspace, and each repository's own tools | mise's installer and `mise install` |
 
-## Setup
-You need a GitHub account that is a member of ByteLibrary.
+### Daily use
 
-1. **Clone this repository.** It is public, so no sign-in is needed yet:
-   ```bash
-   git clone https://github.com/ByteLibrary/workbench.git ~/ByteLibrary/workbench
-   ```
-2. **Run the setup**, and answer its questions. It signs you in through the ByteLibrary Developer
-   Access App ([docs/github-access.md](docs/github-access.md)):
-   ```bash
-   ~/ByteLibrary/workbench/setup.sh
-   ```
+| Do | Command, on your computer |
+|---|---|
+| Stop the machine and free its memory | `multipass stop bytelibrary` |
+| Start it again | `multipass start bytelibrary` |
+
+### Editors
+Any editor that works over SSH works: the rules live in each repository's tools, and language servers
+run inside the machine. Zed and VS Code are recommended, and every repository ships settings for both.
+
+| Editor | Connect |
+|---|---|
+| [Zed](https://zed.dev) | Open Remote Project → `bytelibrary` |
+| [VS Code](https://code.visualstudio.com) | Install the Remote - SSH extension → Connect to Host → `bytelibrary`, then open `~/ByteLibrary/ByteLibrary.code-workspace` |
+
+### Agent CLIs
+Install the agent CLI you use **inside the machine**, never on your computer, and sign in with your own
+subscription. The machine is the agents' sandbox: nothing from your computer is mounted into it.
 
 ### Without questions
 For CI, setup runs without asking anything when these environment variables are set (see the
@@ -54,11 +96,13 @@ ByteLibrary CI App (`CI_APP_CLIENT_ID` and `CI_APP_PRIVATE_KEY`, see [docs/githu
 
 | Where | Change |
 |---|---|
+| `~/.ssh/authorized_keys` | Your editor's SSH key, from step 2 |
 | `~/.config/gh-bytelibrary/` | The `gh` sign-in through the ByteLibrary Developer Access App |
 | `~/.config/bytelibrary/git-credentials` | The same sign-in for git, readable only by you |
 | `~/.gitconfig-bytelibrary` | Commit identity, GitHub credentials and the organization's git hooks (`hooks/`) for workspace repositories |
 | `~/.gitconfig` | One `includeIf` line that loads the file above only under `~/ByteLibrary/`. With your confirmation, removes machine-wide GitHub credential helpers (a backup is kept). |
 | `~/ByteLibrary/` | All repositories, plus the workspace `AGENTS.md`, `mise.toml` and `ByteLibrary.code-workspace` (opens every repository in VS Code) |
+| `~/.bashrc` | With your confirmation, one line that activates mise in new shells |
 | `~/.local/bin/playbook` | The [playbook](https://github.com/ByteLibrary/playbook)'s command, installed by its own installer |
 | `~/.agents/skills/bytelibrary-*` | The playbook's skills, in the shared location agent CLIs read skills from |
 | `~/.config/systemd/user/` | `bytelibrary-update.timer` and its service, which update the workspace every 10 minutes |
@@ -125,5 +169,6 @@ the rules script from the workspace clone of `reusable-ci-workflows`, the same o
 | The doctor reports a difference between the handbook's data and GitHub | Decide which one is wrong. Fix the handbook's data through a pull request, or fix GitHub (an owner) so it matches. |
 | The doctor reports that repository settings differ | An owner applies the repository settings from the handbook's repository conventions to that repository. |
 | `git push` asks for a password | The repository is outside `~/ByteLibrary/`, or setup has not run. Run `./setup.sh`. |
-| Docker checks fail | Start the daemon (`sudo service docker start`) and check you are in the `docker` group. |
+| Docker checks fail | Reconnect to the machine: being added to the `docker` group only applies to new sessions. If it still fails, `sudo systemctl start docker`. |
+| The editor does not find `bytelibrary.local` | Check the machine is running (`multipass list`). On Linux, your computer resolves `.local` names through mDNS, usually already installed (`libnss-mdns`). |
 | git or `gh` is refused after you revoked access | Run `scripts/sign-in.sh`. |
