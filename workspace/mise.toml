@@ -11,7 +11,7 @@ run = "workbench/scripts/update.sh"
 
 [tasks.doctor]
 description = "Check tools, GitHub access, the firewall, the handbook's data against GitHub and the workspace"
-run = "workbench/scripts/doctor.py"
+run = "workbench/scripts/doctor.sh"
 
 [tasks.sign-in]
 description = "Sign in through the ByteLibrary Developer Access App again, for example after revoking access"
