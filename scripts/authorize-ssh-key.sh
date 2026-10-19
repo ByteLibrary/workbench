@@ -7,8 +7,10 @@ authorized="$HOME/.ssh/authorized_keys"
 if [[ -s "$EDITOR_SSH_KEY_FILE" ]]; then
   mkdir -p "$HOME/.ssh" && chmod 700 "$HOME/.ssh"
   touch "$authorized" && chmod 600 "$authorized"
-  if ! grep -qxF "$(cat "$EDITOR_SSH_KEY_FILE")" "$authorized"; then
-    cat "$EDITOR_SSH_KEY_FILE" >>"$authorized"
+  # PowerShell ends piped lines with a carriage return.
+  key="$(tr -d '\r' <"$EDITOR_SSH_KEY_FILE")"
+  if ! grep -qxF "$key" "$authorized"; then
+    echo "$key" >>"$authorized"
   fi
   rm "$EDITOR_SSH_KEY_FILE"
   ok "Your editor's SSH key is authorized"
