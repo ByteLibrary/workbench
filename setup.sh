@@ -18,7 +18,8 @@ mkdir -p "$WORKSPACE_DIR" && cd "$WORKSPACE_DIR"
 "$REPOSITORY_DIR/scripts/configure-updates.sh"
 
 # A docker group membership added by this run only applies to new sessions; check with it already.
-if id -nG "$USER" | tr ' ' '\n' | grep -qx docker || ! getent group docker | grep -qw "$USER"; then
+# `id -nG` without a user lists this session's groups; with a user, it would read the updated group file.
+if id -nG | tr ' ' '\n' | grep -qx docker || ! getent group docker | grep -qw "$USER"; then
   "$REPOSITORY_DIR/scripts/doctor.sh"
 else
   sg docker -c "$REPOSITORY_DIR/scripts/doctor.sh"
