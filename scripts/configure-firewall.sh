@@ -58,7 +58,11 @@ WantedBy=multi-user.target
 EOF
 if ((changed)); then sudo systemctl daemon-reload; fi
 sudo systemctl enable --quiet bytelibrary-firewall.service bytelibrary-firewall.path
-sudo systemctl restart bytelibrary-firewall.service
+if ! sudo systemctl restart bytelibrary-firewall.service; then
+  sudo journalctl --unit bytelibrary-firewall.service --unit bytelibrary-dns.service --lines 15 --no-pager --output cat |
+    while read -r line; do warn "$line"; done
+  fail "The site allowlist did not start; its log is above."
+fi
 sudo systemctl start bytelibrary-firewall.path
 
 # The machine asks the allowlist resolver; systemd-resolved keeps tracking the network's DNS servers,
