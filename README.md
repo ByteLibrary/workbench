@@ -89,7 +89,7 @@ handbook's configuration and secrets convention):
 | `BYTELIBRARY_COMMIT_NAME`, `BYTELIBRARY_COMMIT_EMAIL` | The commit identity |
 
 Every question is then answered no, and the doctor skips the checks of a person's sign-in. CI's
-"Setup on a fresh machine" job runs it this way on every pull request, with a one-hour token from the
+"Setup" check runs it this way on every pull request, with a one-hour token from the
 ByteLibrary CI App (`CI_APP_CLIENT_ID` and `CI_APP_PRIVATE_KEY`, see [docs/github-access.md](docs/github-access.md)).
 
 ## What the setup changes
@@ -123,8 +123,7 @@ Every script is safe to run again.
 | `scripts/write-workspace-files.sh` | Rewrites the workspace `AGENTS.md` and `mise.toml` after they change here |
 | `scripts/install-playbook.sh` | Installs the playbook's command and skills again |
 | `scripts/configure-git-hooks.sh` | Makes every workspace repository use the organization's git hooks |
-| `scripts/test-hooks.sh` | Tests the git hooks in a throwaway workspace (also run by CI) |
-| `scripts/test-update.sh` | Tests the workspace update in a throwaway workspace (also run by CI) |
+| `mise run test` | Tests the git hooks and the workspace update in throwaway workspaces, as the `Tests` check does |
 
 Scripts that work on every repository only include repositories that follow the handbook's
 conventions, identified by a kind topic. The kinds are read from the handbook's
