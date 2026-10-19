@@ -69,7 +69,7 @@ jobs:
         run: |
           # Shows setup's warnings and last line on the pull request when it fails.
           set -o pipefail
-          trap 'echo "::error title=setup.sh::$( (grep -F "!!" setup.log; tail -1 setup.log) | sed "s/\x1b\[[0-9;]*m//g" | tr "\n" " ")"' ERR
+          trap 'echo "::error title=setup.sh::$( (grep -F -A3 "!!" setup.log; tail -1 setup.log) | sed "s/\x1b\[[0-9;]*m//g" | tr "\n" " ")"' ERR
           ByteLibrary/workbench/setup.sh </dev/null 2>&1 | tee setup.log
   readme-steps:
     name: README steps
