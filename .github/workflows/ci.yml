@@ -88,6 +88,8 @@ jobs:
           # Docker, preinstalled on the runner, drops forwarded traffic, which would leave the machine
           # without a network; a developer's computer has no such rule.
           sudo iptables -P FORWARD ACCEPT
+          # Right after installing, Multipass may not have loaded its image catalogue yet.
+          for _ in $(seq 30); do sudo multipass find 24.04 >/dev/null 2>&1 && break; sleep 5; done
           if ! output="$(sudo multipass launch 24.04 --name ci-machine --cpus 2 --memory 2G --disk 10G --timeout 900 2>&1)"; then
             echo "::error title=multipass launch::$(tail -3 <<<"$output" | tr '\n' ' ')"
             exit 1
