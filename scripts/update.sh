@@ -22,6 +22,17 @@ busy() {
      -e "$git_dir/MERGE_HEAD" || -e "$git_dir/CHERRY_PICK_HEAD" ]]
 }
 
+# A changed or newly cloned playbook is installed again, so its commands and skills stay current.
+reinstall_playbook() {
+  if ! command -v mise >/dev/null && ! command -v uv >/dev/null; then
+    note "playbook: changed, but not installed again: it needs mise; run workbench/scripts/install-playbook.sh once mise is installed"
+  elif "$REPOSITORY_DIR/scripts/install-playbook.sh" >/dev/null 2>&1; then
+    note "playbook: installed again"
+  else
+    note "playbook: could not be installed again; run workbench/scripts/install-playbook.sh"
+  fi
+}
+
 update_repository() {
   local directory="$1" name branch behind ahead
   name="$(basename "$directory")"
@@ -48,6 +59,9 @@ update_repository() {
         note "$name: updated, $behind new commit(s)"
         if [[ "$name" == workbench ]]; then
           note "workbench changed: run workbench/setup.sh to apply it"
+        fi
+        if [[ "$name" == playbook ]]; then
+          reinstall_playbook
         fi
       else
         note "$name: $behind new commit(s) on main, not applied: git refused to fast-forward"
@@ -77,6 +91,9 @@ if cloned="$("$REPOSITORY_DIR/scripts/clone-repositories.sh" 2>/dev/null)"; then
   if [[ -n "$new" ]]; then
     note "cloned new repositories: $new"
     "$REPOSITORY_DIR/scripts/write-workspace-files.sh" >/dev/null
+    if [[ ", $new, " == *", playbook, "* ]]; then
+      reinstall_playbook
+    fi
   fi
 else
   note "could not list the organization's repositories; check the sign-in with scripts/doctor.sh"

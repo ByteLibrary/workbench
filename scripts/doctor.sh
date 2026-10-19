@@ -126,6 +126,10 @@ check_workspace_repositories() {
   fi
 }
 
+playbook_installed() { command -v playbook || test -x "$HOME/.local/bin/playbook"; }
+
+playbook_skills_installed() { compgen -G "${PLAYBOOK_SKILLS_DIR:-$HOME/.agents/skills}/bytelibrary-*/SKILL.md"; }
+
 # Compares the project's Context options with the handbook's contexts (plus "organization").
 check_contexts_match_project() {
   local expected actual missing extra
@@ -191,6 +195,8 @@ check "workspace AGENTS.md exists" test -f "$WORKSPACE_DIR/AGENTS.md"
 check "workspace mise.toml exists" test -f "$WORKSPACE_DIR/mise.toml"
 check "handbook is cloned" test -d "$WORKSPACE_DIR/handbook/.git"
 check_workspace_repositories
+check "the playbook command is installed" playbook_installed
+check "the playbook's skills are in ${PLAYBOOK_SKILLS_DIR:-$HOME/.agents/skills}" playbook_skills_installed
 
 info "Workspace updates"
 if [[ -s "$UPDATE_REPORT_FILE" ]]; then
