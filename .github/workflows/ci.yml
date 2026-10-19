@@ -115,6 +115,7 @@ jobs:
           COMMIT: ${{ github.event.pull_request.head.sha }}
         run: |
           # Shows setup's last lines on the pull request when it fails.
+          set -o pipefail
           trap 'echo "::error title=setup.sh::$(tail -5 setup.log | tr "\n" " ")"' ERR
           sudo multipass exec bytelibrary -- env BYTELIBRARY_GITHUB_TOKEN="$TOKEN" \
             BYTELIBRARY_COMMIT_NAME="ByteLibrary CI" BYTELIBRARY_COMMIT_EMAIL=ci@bytelibrary.invalid COMMIT="$COMMIT" \
