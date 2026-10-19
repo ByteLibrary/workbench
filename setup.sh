@@ -3,7 +3,8 @@
 source "$(dirname "$0")/scripts/lib.sh"
 
 # The workspace's mise.toml decides the tools' versions, so setup runs from the workspace.
-mkdir -p "$WORKSPACE_DIR" && cd "$WORKSPACE_DIR"
+mkdir -p "$WORKSPACE_DIR"
+cd "$WORKSPACE_DIR" || exit
 
 "$REPOSITORY_DIR/scripts/install-system-packages.sh"
 "$REPOSITORY_DIR/scripts/authorize-ssh-key.sh"
