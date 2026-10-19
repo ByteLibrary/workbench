@@ -1,7 +1,7 @@
-# GitHub access for ByteLibrary
+# GitHub access
 
 Developers, and the agents working for them, sign in through the **ByteLibrary Developer Access**
-GitHub App, owned by the organization (ADR-0026 of the organization handbook). Nobody creates or
+GitHub App, owned by the organization (ADR-0026 of the handbook). Nobody creates or
 configures a personal access token.
 
 ## How access works
@@ -76,7 +76,7 @@ in again.
 
 ## For owners: the CI App
 CI cannot approve a sign-in, so it has its own GitHub App, **ByteLibrary CI**, which acts as itself and
-only reads (ADR-0027 of the organization handbook). Each workflow run creates a token from the App's Client ID
+only reads (ADR-0027 of the handbook). Each workflow run creates a token from the App's Client ID
 and private key with GitHub's `actions/create-github-app-token` action; the token expires after one hour.
 
 **ByteLibrary → Settings → Developer settings → GitHub Apps → ByteLibrary CI.**
