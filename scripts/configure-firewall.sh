@@ -36,8 +36,8 @@ Description=ByteLibrary site allowlist (workbench scripts/firewall.sh)
 After=network.target docker.service
 
 [Service]
+# Runs and finishes, so each change to a sites file starts it again.
 Type=oneshot
-RemainAfterExit=yes
 # Services start without HOME, which the scripts' shared settings use.
 Environment=HOME=/root
 Environment=BYTELIBRARY_PERSONAL_SITES=$personal_sites

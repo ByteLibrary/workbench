@@ -168,7 +168,7 @@ check "gh is installed" command -v gh
 check "mise is installed" command -v mise
 check "Docker daemon is reachable" docker info
 check "Docker Compose is available" docker compose version
-check "the site allowlist is active" systemctl is-active --quiet bytelibrary-firewall.service bytelibrary-dns.service
+check "the site allowlist is active" systemctl is-active --quiet bytelibrary-dns.service bytelibrary-firewall.path
 check "an allowed site is reachable (github.com)" curl -fsS -o /dev/null --max-time 15 https://github.com
 check "a site not on the allowlist is blocked (example.com)" site_blocked
 host_mounts="$(findmnt --types fuse.sshfs --noheadings --output TARGET || true)"
