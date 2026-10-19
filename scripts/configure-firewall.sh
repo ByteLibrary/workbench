@@ -80,7 +80,8 @@ fi
 
 # Containers ask the same resolver, on Docker's bridge.
 docker_config=/etc/docker/daemon.json
-docker_dns="$(sudo cat "$docker_config" 2>/dev/null | python3 -c '
+# On a fresh machine, Docker has no settings file yet.
+docker_dns="$({ sudo cat "$docker_config" 2>/dev/null || true; } | python3 -c '
 import json, sys
 text = sys.stdin.read()
 config = json.loads(text) if text.strip() else {}
