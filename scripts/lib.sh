@@ -18,6 +18,12 @@ APP_CLIENT_ID="Iv23liYsI5hIzrbCg40q"
 HANDBOOK_DATA_DIR="${BYTELIBRARY_HANDBOOK_DATA_DIR:-$WORKSPACE_DIR/handbook/data}"
 PROJECT_NUMBER=1
 REPOSITORY_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+# mise itself, pinned like every tool it installs (ADR-0028).
+MISE_VERSION="v2026.10.3"
+
+# mise and the tools it installs, also in shells where mise is not activated yet (such as setup's first
+# run). The shims pick the version pinned by the nearest mise.toml.
+PATH="$HOME/.local/bin:$HOME/.local/share/mise/shims:$PATH"
 
 info() { printf '\033[34m==>\033[0m %s\n' "$*"; }
 ok()   { printf '\033[32m ok\033[0m %s\n' "$*"; }
@@ -60,7 +66,8 @@ store_git_credentials() {
 # Facts from the handbook's data tables (see handbook_data.py). Uses the handbook's own environment, which
 # has the pinned YAML library, once it exists; the system Python until then.
 handbook_data() {
-  local python=python3
+  # The system's Python, which has PyYAML (install-system-packages.sh); mise's Python may not.
+  local python=/usr/bin/python3
   [[ -x "$WORKSPACE_DIR/handbook/.venv/bin/python" ]] && python="$WORKSPACE_DIR/handbook/.venv/bin/python"
   [[ -d "$HANDBOOK_DATA_DIR" ]] || fail "The handbook's data is missing: $HANDBOOK_DATA_DIR"
   "$python" "$REPOSITORY_DIR/scripts/handbook_data.py" "$HANDBOOK_DATA_DIR" "$1"

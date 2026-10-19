@@ -10,5 +10,8 @@ description = "Update every workspace repository now, as the background update d
 run = "workbench/scripts/update.sh"
 
 [tools]
-# Shared tools are added here, with pinned versions, when the first repository needs them:
-# OpenTofu, kubectl, Helm, kind, Buf, Copier. Language toolchains are pinned per repository.
+# Only what the workspace itself needs (ADR-0028). Tools a repository builds, tests or lints with are
+# pinned in that repository's mise.toml, so its CI uses the same versions.
+gh = "2.102.0"
+python = "3.14.8"
+shellcheck = "0.11.0"

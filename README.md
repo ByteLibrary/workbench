@@ -15,17 +15,14 @@ flowchart LR
 ```
 
 ## Prerequisites
-Tested on **Ubuntu on WSL2**.
+Setup runs inside the development machine: Ubuntu 24.04, with `sudo`. It installs everything else
+itself, at versions pinned in git:
 
-| Tool | Install |
+| What | From |
 |---|---|
-| git | `sudo apt install git` |
-| Python 3 with PyYAML | `sudo apt install python3 python3-yaml` (reads the handbook's data) |
-| GitHub CLI (`gh`) | `sudo apt install gh` |
-| mise | See [mise installation](https://mise.jdx.dev/installing-mise.html), then add `eval "$(mise activate bash)"` to `~/.bashrc` |
-| Docker Engine | See [Docker Engine for Ubuntu](https://docs.docker.com/engine/install/ubuntu/), then add yourself to the `docker` group |
-
-Docker Engine runs directly inside WSL2; Docker Desktop is not needed.
+| git, curl, CA certificates, Python 3 with PyYAML (for setup's own scripts) | Ubuntu's packages |
+| Docker Engine, and the `docker` group for you | Docker's repository |
+| mise, then `gh`, Python and ShellCheck for the workspace, and each repository's own tools | mise's installer and `mise install` |
 
 ## Setup
 You need a GitHub account that is a member of ByteLibrary.
