@@ -101,7 +101,11 @@ jobs:
             exit 1
           fi
       - name: "Step 2: give it the SSH key"
-        run: sudo multipass transfer "$HOME/.ssh/id_ed25519.pub" bytelibrary:/home/ubuntu/editor-ssh-key.pub
+        run: |
+          if ! output="$(sudo multipass transfer "$HOME/.ssh/id_ed25519.pub" bytelibrary:/home/ubuntu/editor-ssh-key.pub 2>&1)"; then
+            echo "::error title=multipass transfer::$(tail -3 <<<"$output" | tr '\n' ' ')"
+            exit 1
+          fi
       - name: Create a token for the ByteLibrary CI App
         id: token
         uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1 # v3.2.0
