@@ -1,15 +1,15 @@
 # workbench
 
-Sets up a ByteLibrary development workspace on a new machine: scoped GitHub access, all
+Sets up a development workspace on a new machine: scoped GitHub access, all
 repositories cloned into `~/ByteLibrary/`, workspace-level agent instructions, and a check that
-everything works. Decided in ADR-0023 and ADR-0026 of the organization handbook.
+everything works. Decided in ADR-0023 and ADR-0026 of the handbook.
 
 ```mermaid
 flowchart LR
   clone["1. Clone this<br/>repository"] --> setup["2. ./setup.sh"]
   setup --> signin["Sign in through the<br/>ByteLibrary Developer Access App"]
   setup --> access["Scope git and gh<br/>to the workspace"]
-  setup --> repos["Clone all ByteLibrary<br/>repositories"]
+  setup --> repos["Clone all<br/>repositories"]
   setup --> files["Write workspace<br/>AGENTS.md and mise.toml"]
   setup --> doctor["Run the doctor check"]
 ```
@@ -59,9 +59,9 @@ ByteLibrary CI App (`CI_APP_CLIENT_ID` and `CI_APP_PRIVATE_KEY`, see [docs/githu
 |---|---|
 | `~/.config/gh-bytelibrary/` | The `gh` sign-in through the ByteLibrary Developer Access App |
 | `~/.config/bytelibrary/git-credentials` | The same sign-in for git, readable only by you |
-| `~/.gitconfig-bytelibrary` | Commit identity, GitHub credentials and the organization's git hooks (`hooks/`) for ByteLibrary repositories |
+| `~/.gitconfig-bytelibrary` | Commit identity, GitHub credentials and the organization's git hooks (`hooks/`) for workspace repositories |
 | `~/.gitconfig` | One `includeIf` line that loads the file above only under `~/ByteLibrary/`. With your confirmation, removes machine-wide GitHub credential helpers (a backup is kept). |
-| `~/ByteLibrary/` | All ByteLibrary repositories, plus the workspace `AGENTS.md`, `mise.toml` and `ByteLibrary.code-workspace` (opens every repository in VS Code) |
+| `~/ByteLibrary/` | All repositories, plus the workspace `AGENTS.md`, `mise.toml` and `ByteLibrary.code-workspace` (opens every repository in VS Code) |
 | `~/.config/systemd/user/` | `bytelibrary-update.timer` and its service, which update the workspace every 10 minutes |
 | `~/.bashrc` | With your confirmation, one line that shows the update report when a terminal opens |
 
@@ -99,7 +99,7 @@ and so does a new terminal if you agreed to it during setup. Runs never overlap,
 git operation in progress is skipped until the next run.
 
 ## Git hooks
-Every workspace repository uses the hooks in `hooks/` (ADR-0024 of the organization handbook). They run
+Every workspace repository uses the hooks in `hooks/` (ADR-0024 of the handbook). They run
 the rules script from the workspace clone of `reusable-ci-workflows`, the same one CI uses:
 
 | Hook | Refuses |

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Sets up a ByteLibrary workspace. Safe to run again at any time.
+# Sets up the workspace. Safe to run again at any time.
 source "$(dirname "$0")/scripts/lib.sh"
 
 command -v git >/dev/null || fail "git is required (see README.md, Prerequisites)"

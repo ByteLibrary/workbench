@@ -1,7 +1,7 @@
 # Agent guide: workbench
 
-Bash scripts that set up a ByteLibrary workspace. Organization-wide rules and conventions are in the
-[organization handbook](https://github.com/ByteLibrary/handbook); read its `AGENTS.md`
+Bash scripts that set up the development workspace. Rules and conventions are in the
+[handbook](https://github.com/ByteLibrary/handbook); read its `AGENTS.md`
 first. Its strict rules apply here.
 
 ## This repository
