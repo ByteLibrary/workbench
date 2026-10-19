@@ -35,6 +35,8 @@ workspace_identity_set() {
   git -C "$REPOSITORY_DIR" config --show-origin user.email | grep -qF "$WORKSPACE_GITCONFIG"
 }
 
+# A failing connection to a site that is not on the allowlist.
+site_blocked() { ! curl -sS -o /dev/null --max-time 10 https://example.com; }
 no_global_github_helper() { ! git config --global --get-all credential.https://github.com.helper; }
 
 # Prints "ok", "drift" or "unreadable" (merge settings are only visible with administration access).
@@ -166,6 +168,20 @@ check "gh is installed" command -v gh
 check "mise is installed" command -v mise
 check "Docker daemon is reachable" docker info
 check "Docker Compose is available" docker compose version
+check "the site allowlist is active" systemctl is-active --quiet bytelibrary-dns.service bytelibrary-firewall.path
+check "an allowed site is reachable (github.com)" curl -fsS -o /dev/null --max-time 15 https://github.com
+check "a site not on the allowlist is blocked (example.com)" site_blocked
+host_mounts="$(findmnt --types fuse.sshfs --noheadings --output TARGET || true)"
+if [[ -z "$host_mounts" ]]; then
+  ok "no folder of your computer is mounted in the machine"
+else
+  warn "folders of your computer are mounted in the machine: $(tr '\n' ' ' <<<"$host_mounts")(multipass umount bytelibrary)"
+  failures=$((failures + 1))
+fi
+recently_blocked="$("$REPOSITORY_DIR/scripts/firewall.sh" blocked | wc -l)"
+if ((recently_blocked > 0)); then
+  info "$recently_blocked site(s) were blocked in the last day: scripts/firewall.sh blocked"
+fi
 
 info "GitHub access"
 if non_interactive; then
