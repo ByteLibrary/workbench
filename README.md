@@ -107,8 +107,33 @@ ByteLibrary CI App (`CI_APP_CLIENT_ID` and `CI_APP_PRIVATE_KEY`, see [docs/githu
 | `~/.agents/skills/bytelibrary-*` | The playbook's skills, in the shared location agent CLIs read skills from |
 | `~/.config/systemd/user/` | `bytelibrary-update.timer` and its service, which update the workspace every 10 minutes |
 | `~/.bashrc` | With your confirmation, one line that shows the update report when a terminal opens |
+| `/etc/systemd/system/bytelibrary-*` | The site allowlist: its resolver, and a service that applies it at boot and when a sites file changes |
+| `/etc/resolv.conf`, `/etc/docker/daemon.json` | The machine and its containers look names up through the allowlist resolver |
+| `~/.config/bytelibrary/allowed-sites` | Sites allowed only on your machine |
 
 Nothing outside the workspace uses the sign-in.
+
+## The firewall
+The machine, and the containers in it, reach only the sites in
+[`firewall/allowed-sites.txt`](firewall/allowed-sites.txt): code hosting, package registries,
+documentation, editors, agent providers and their tools. The local network, such as your editor's
+SSH connection, is not affected. It is a guardrail against accidents, such as an agent steered by
+something it read into sending data to an unknown site, not a wall: `sudo` can turn it off, and the
+doctor reports it.
+
+A site that is not on the list fails as if it did not exist. To see what was refused:
+
+```bash
+scripts/firewall.sh blocked
+```
+
+To allow a site, add the domain (it covers its subdomains) to:
+
+- `firewall/allowed-sites.txt`, in its group, through a pull request, for everyone;
+- `~/.config/bytelibrary/allowed-sites`, for your machine only, by your own judgement.
+
+Either applies as soon as the file changes. Agents never allow a site themselves: they report the
+blocked domain and ask.
 
 ## Commands
 Every script is safe to run again.
@@ -123,6 +148,8 @@ Every script is safe to run again.
 | `scripts/write-workspace-files.sh` | Rewrites the workspace `AGENTS.md` and `mise.toml` after they change here |
 | `scripts/install-playbook.sh` | Installs the playbook's command and skills again |
 | `scripts/configure-git-hooks.sh` | Makes every workspace repository use the organization's git hooks |
+| `scripts/firewall.sh blocked` | Lists the sites the firewall refused in the last day |
+| `scripts/firewall.sh apply` | Applies the sites files now; it also happens on its own when they change |
 | `mise run test` | Tests the git hooks and the workspace update in throwaway workspaces, as the `Tests` check does |
 
 Scripts that work on every repository only include repositories that follow the handbook's

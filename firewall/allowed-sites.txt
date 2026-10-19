@@ -1,0 +1,191 @@
+# The sites the development machine and its containers may reach (ByteLibrary/roadmap#26, decision 15).
+# Each line allows a domain and every subdomain of it. Everything else is blocked, apart from the local
+# network, NTP and Docker's internal networks.
+#
+# To allow a site for everyone, add it here in its group, as narrow as practical, in a pull request.
+# To allow one only on your machine, add it to ~/.config/bytelibrary/allowed-sites. Both apply as soon
+# as the file changes. `scripts/firewall.sh blocked` shows what was refused.
+#
+# Kept off on purpose: general file and paste hosts, URL shorteners, general cloud storage, cloud
+# provider APIs (added narrowly when a provider is chosen) and services we do not use.
+
+# GitHub: git, the API, releases, packages, Actions and its logs.
+github.com
+githubusercontent.com
+github.io
+githubassets.com
+ghcr.io
+githubstatus.com
+productionresultssa0.blob.core.windows.net
+productionresultssa1.blob.core.windows.net
+productionresultssa2.blob.core.windows.net
+productionresultssa3.blob.core.windows.net
+productionresultssa4.blob.core.windows.net
+productionresultssa5.blob.core.windows.net
+productionresultssa6.blob.core.windows.net
+productionresultssa7.blob.core.windows.net
+productionresultssa8.blob.core.windows.net
+productionresultssa9.blob.core.windows.net
+productionresultssa10.blob.core.windows.net
+productionresultssa11.blob.core.windows.net
+productionresultssa12.blob.core.windows.net
+productionresultssa13.blob.core.windows.net
+productionresultssa14.blob.core.windows.net
+productionresultssa15.blob.core.windows.net
+productionresultssa16.blob.core.windows.net
+productionresultssa17.blob.core.windows.net
+productionresultssa18.blob.core.windows.net
+productionresultssa19.blob.core.windows.net
+
+# Other git hosting platforms, where dependencies and tools live.
+gitlab.com
+bitbucket.org
+codeberg.org
+sr.ht
+gitea.com
+
+# Tooling: mise and the signatures it verifies, uv and ruff.
+mise.run
+jdx.dev
+sigstore.dev
+astral.sh
+
+# Certificate revocation checks, which some tools need to trust HTTPS.
+lencr.org
+digicert.com
+sectigo.com
+globalsign.com
+pki.goog
+
+# Operating system and container images.
+ubuntu.com
+launchpad.net
+snapcraft.io
+snapcraftcontent.com
+docker.io
+docker.com
+quay.io
+gcr.io
+registry.k8s.io
+mcr.microsoft.com
+
+# Python.
+pypi.org
+pythonhosted.org
+python.org
+
+# Go.
+go.dev
+golang.org
+dl.google.com
+
+# JavaScript and TypeScript.
+npmjs.org
+npmjs.com
+nodejs.org
+typescriptlang.org
+yarnpkg.com
+
+# Java and Kotlin.
+maven.org
+repo.maven.apache.org
+gradle.org
+kotlinlang.org
+oracle.com
+adoptium.net
+foojay.io
+
+# Rust.
+crates.io
+rust-lang.org
+docs.rs
+
+# Other languages' package registries.
+rubygems.org
+packagist.org
+nuget.org
+hex.pm
+
+# Security advisories and vulnerability databases.
+osv.dev
+nvd.nist.gov
+cve.org
+
+# Documentation of our stack.
+kubernetes.io
+postgresql.org
+apache.org
+opentelemetry.io
+prometheus.io
+grafana.com
+grpc.io
+protobuf.dev
+buf.build
+keycloak.org
+openid.net
+oauth.net
+redis.io
+helm.sh
+terraform.io
+hashicorp.com
+cncf.io
+mermaid.js.org
+
+# Architecture and general developer references.
+martinfowler.com
+microservices.io
+12factor.net
+c4model.com
+refactoring.guru
+stackoverflow.com
+stackexchange.com
+developer.mozilla.org
+wikipedia.org
+readthedocs.io
+readthedocs.org
+semver.org
+conventionalcommits.org
+json-schema.org
+schemastore.org
+yaml.org
+datatracker.ietf.org
+w3.org
+shellcheck.net
+spdx.org
+choosealicense.com
+
+# Major clouds' documentation (not their APIs).
+docs.aws.amazon.com
+cloud.google.com
+learn.microsoft.com
+
+# Editors: extensions, remote servers and updates.
+zed.dev
+visualstudio.com
+vsassets.io
+vscode-cdn.net
+open-vsx.org
+
+# Agent providers and agent CLIs: APIs, sign-in, installers and documentation.
+anthropic.com
+claude.ai
+claude.com
+openai.com
+chatgpt.com
+generativelanguage.googleapis.com
+ai.google.dev
+githubcopilot.com
+mistral.ai
+cursor.com
+cursor.sh
+opencode.ai
+aider.chat
+block.xyz
+openrouter.ai
+huggingface.co
+ollama.com
+
+# Agent ecosystem: MCP, documentation-type MCP servers and the AGENTS.md convention.
+modelcontextprotocol.io
+context7.com
+agents.md

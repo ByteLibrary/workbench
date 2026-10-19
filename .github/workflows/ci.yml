@@ -121,3 +121,27 @@ jobs:
           printf 'Host bytelibrary\n  HostName bytelibrary.local\n  User ubuntu\n  StrictHostKeyChecking accept-new\n' >>"$HOME/.ssh/config"
           ssh bytelibrary 'test -d ~/ByteLibrary/handbook/.git && test -x ~/.local/bin/playbook && docker info >/dev/null'
           echo "::notice title=README steps::Steps 1 to 4 work: the machine is set up, and reached by name over SSH"
+      - name: "The firewall allows only listed sites, from the machine and from containers"
+        run: |
+          # Runs in the machine; prints each check, and fails on the first one that does not hold.
+          if ! output="$(ssh bytelibrary 'bash -s' 2>&1 <<'CHECKS'
+          set -uo pipefail
+          expect() { if eval "$2" >/dev/null 2>&1; then echo "ok   $1"; else echo "FAIL $1"; exit 1; fi; }
+          expect "an allowed site is reachable" "curl -fsS --max-time 15 https://github.com"
+          expect "a site not on the list is blocked" "! curl -sS --max-time 10 https://example.com"
+          expect "an address not looked up through the resolver is blocked" "! curl -sS --max-time 10 http://1.1.1.1"
+          expect "a container reaches an allowed site" "docker run --rm curlimages/curl -fsS --max-time 15 https://github.com"
+          expect "a container is blocked from a site not on the list" "! docker run --rm curlimages/curl -sS --max-time 10 https://example.com"
+          expect "containers reach each other" "docker network create firewall-test && docker run -d --rm --name firewall-web --network firewall-test nginx:alpine && sleep 2 && docker run --rm --network firewall-test curlimages/curl -fsS --max-time 10 http://firewall-web"
+          expect "the blocked site is reported" "~/ByteLibrary/workbench/scripts/firewall.sh blocked | grep -q example.com"
+          echo example.com >>~/.config/bytelibrary/allowed-sites
+          sleep 5
+          expect "a site in the personal file is reachable" "curl -fsS --max-time 15 https://example.com"
+          expect "the doctor reports a stopped firewall" "sudo systemctl stop bytelibrary-firewall.service bytelibrary-dns.service && ! ~/ByteLibrary/workbench/scripts/doctor.sh"
+          CHECKS
+          )"; then
+            echo "$output"
+            echo "::error title=Firewall::$(grep FAIL <<<"$output" | tr '\n' ' ')"
+            exit 1
+          fi
+          echo "$output"

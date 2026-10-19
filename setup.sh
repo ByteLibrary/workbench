@@ -7,6 +7,7 @@ mkdir -p "$WORKSPACE_DIR"
 cd "$WORKSPACE_DIR" || exit
 
 "$REPOSITORY_DIR/scripts/install-system-packages.sh"
+"$REPOSITORY_DIR/scripts/configure-firewall.sh"
 "$REPOSITORY_DIR/scripts/authorize-ssh-key.sh"
 "$REPOSITORY_DIR/scripts/write-workspace-files.sh"
 "$REPOSITORY_DIR/scripts/install-tools.sh"
