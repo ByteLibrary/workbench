@@ -73,8 +73,8 @@ jobs:
         run: sudo apt-get install --yes python3-yaml
       - name: Test the workspace update
         run: scripts/test-update.sh
-  machine:
-    name: README on a Linux computer
+  readme-steps:
+    name: README steps
     runs-on: ubuntu-24.04
     timeout-minutes: 60
     # Pull requests from forks get no secrets, so they cannot create the CI App's token.
@@ -126,4 +126,4 @@ jobs:
         run: |
           printf 'Host bytelibrary\n  HostName bytelibrary.local\n  User ubuntu\n  StrictHostKeyChecking accept-new\n' >>"$HOME/.ssh/config"
           ssh bytelibrary 'test -d ~/ByteLibrary/handbook/.git && test -x ~/.local/bin/playbook && docker info >/dev/null'
-          echo "::notice title=README on a Linux computer::Steps 1 to 4 work: the machine is set up, and reached by name over SSH"
+          echo "::notice title=README steps::Steps 1 to 4 work: the machine is set up, and reached by name over SSH"
