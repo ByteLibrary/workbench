@@ -42,10 +42,9 @@ def repository_differences(documented: list[dict], on_github: list[dict], kinds:
             problems.append(f"{name} is active in the handbook but does not exist on GitHub")
             continue
         repository = github[name]
+        # Topics are the kind and the context; GitHub detects the language (40-conventions/repositories.md).
         expected_topics = sorted(
-            [entry["kind"]]
-            + ([f"context-{entry['context']}"] if entry.get("context") else [])
-            + ([f"language-{entry['language']}"] if entry.get("language") else [])
+            [entry["kind"]] + ([f"context-{entry['context']}"] if entry.get("context") else [])
         )
         differences = []
         if repository["visibility"] != entry["visibility"]:
