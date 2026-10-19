@@ -114,11 +114,13 @@ jobs:
           TOKEN: ${{ steps.token.outputs.token }}
           COMMIT: ${{ github.event.pull_request.head.sha }}
         run: |
+          # Shows setup's last lines on the pull request when it fails.
+          trap 'echo "::error title=setup.sh::$(tail -5 setup.log | tr "\n" " ")"' ERR
           sudo multipass exec bytelibrary -- env BYTELIBRARY_GITHUB_TOKEN="$TOKEN" \
             BYTELIBRARY_COMMIT_NAME="ByteLibrary CI" BYTELIBRARY_COMMIT_EMAIL=ci@bytelibrary.invalid COMMIT="$COMMIT" \
             bash -c 'git clone --quiet https://github.com/ByteLibrary/workbench.git ~/ByteLibrary/workbench &&
               git -C ~/ByteLibrary/workbench checkout --quiet "$COMMIT" &&
-              ~/ByteLibrary/workbench/setup.sh </dev/null'
+              ~/ByteLibrary/workbench/setup.sh </dev/null' 2>&1 | tee setup.log
       - name: "Step 4: connect over SSH to bytelibrary.local, as the editor does"
         run: |
           printf 'Host bytelibrary\n  HostName bytelibrary.local\n  User ubuntu\n  StrictHostKeyChecking accept-new\n' >>"$HOME/.ssh/config"
