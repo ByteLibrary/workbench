@@ -21,6 +21,8 @@ case "$1" in
 esac
 GH
 chmod +x "$work/bin/gh"
+# Stands in for uv, so the playbook's installer can run without mise.
+printf '#!/usr/bin/env bash\nexit 0\n' >"$work/bin/uv" && chmod +x "$work/bin/uv"
 export PATH="$work/bin:$PATH"
 
 # A remote with one commit, and a clone of it in the workspace (unless it is new).
@@ -28,6 +30,11 @@ remote() {
   git init --quiet --bare "$REMOTES/$1.git"
   git clone --quiet "$REMOTES/$1.git" "$work/seed-$1" 2>/dev/null
   echo "$1" >"$work/seed-$1/README.md"
+  if [[ "$1" == playbook ]]; then
+    # Stands in for the playbook's installer: records each run.
+    printf '#!/usr/bin/env bash\necho run >>"%s/playbook-installs"\n' "$work" >"$work/seed-$1/install.sh"
+    chmod +x "$work/seed-$1/install.sh"
+  fi
   if [[ "$1" == handbook ]]; then
     mkdir -p "$work/seed-$1/data"
     printf -- '- code: tooling\n  description: Tools\n' >"$work/seed-$1/data/repository-kinds.yaml"
@@ -43,12 +50,13 @@ advance() {
   git -C "$work/seed-$1" push --quiet origin main
 }
 
-for name in handbook alpha beta gamma delta; do remote "$name"; done
+for name in handbook alpha beta gamma delta playbook; do remote "$name"; done
 remote epsilon new
 
 # alpha: main, clean, behind. beta: main with local changes, behind. gamma: a branch whose pull request
 # was merged, behind main. delta: a git operation in progress.
 advance alpha
+advance playbook
 advance beta && echo "local" >>"$BYTELIBRARY_WORKSPACE_DIR/beta/README.md"
 git -C "$BYTELIBRARY_WORKSPACE_DIR/gamma" switch --quiet -c feat/1-example
 git -C "$BYTELIBRARY_WORKSPACE_DIR/gamma" push --quiet -u origin feat/1-example 2>/dev/null
@@ -80,6 +88,8 @@ expect "a repository with a git operation in progress is skipped" reports "delta
 expect "a new repository is cloned" test -d "$BYTELIBRARY_WORKSPACE_DIR/epsilon/.git"
 expect "... reported" reports "cloned new repositories: epsilon"
 expect "... and added to the workspace files" grep -q epsilon "$BYTELIBRARY_WORKSPACE_DIR/ByteLibrary.code-workspace"
+expect "a changed playbook is installed again" test -s "$work/playbook-installs"
+expect "... and reported" reports "playbook: installed again"
 expect "the report is written for agents" grep -qF "alpha: updated" "$BYTELIBRARY_WORKSPACE_DIR/.workspace-update.md"
 
 second="$("$repository_dir/scripts/update.sh" 2>&1)"

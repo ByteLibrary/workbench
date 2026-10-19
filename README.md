@@ -62,6 +62,8 @@ ByteLibrary CI App (`CI_APP_CLIENT_ID` and `CI_APP_PRIVATE_KEY`, see [docs/githu
 | `~/.gitconfig-bytelibrary` | Commit identity, GitHub credentials and the organization's git hooks (`hooks/`) for workspace repositories |
 | `~/.gitconfig` | One `includeIf` line that loads the file above only under `~/ByteLibrary/`. With your confirmation, removes machine-wide GitHub credential helpers (a backup is kept). |
 | `~/ByteLibrary/` | All repositories, plus the workspace `AGENTS.md`, `mise.toml` and `ByteLibrary.code-workspace` (opens every repository in VS Code) |
+| `~/.local/bin/playbook` | The [playbook](https://github.com/ByteLibrary/playbook)'s command, installed by its own installer |
+| `~/.agents/skills/bytelibrary-*` | The playbook's skills, in the shared location agent CLIs read skills from |
 | `~/.config/systemd/user/` | `bytelibrary-update.timer` and its service, which update the workspace every 10 minutes |
 | `~/.bashrc` | With your confirmation, one line that shows the update report when a terminal opens |
 
@@ -78,6 +80,7 @@ Every script is safe to run again.
 | `scripts/doctor.sh` | Checks tools, GitHub access, that the handbook's data matches GitHub, repository settings, the workspace (every repository uses the git hooks, no checked-out `main` behind GitHub), and shows the latest update report |
 | `scripts/clone-repositories.sh` | Clones repositories added to the organization since the last run |
 | `scripts/write-workspace-files.sh` | Rewrites the workspace `AGENTS.md` and `mise.toml` after they change here |
+| `scripts/install-playbook.sh` | Installs the playbook's command and skills again |
 | `scripts/configure-git-hooks.sh` | Makes every workspace repository use the organization's git hooks |
 | `scripts/test-hooks.sh` | Tests the git hooks in a throwaway workspace (also run by CI) |
 | `scripts/test-update.sh` | Tests the workspace update in a throwaway workspace (also run by CI) |
@@ -92,11 +95,18 @@ with a kind topic, plus the project's Context options against `data/contexts.yam
 
 ## Keeping up to date
 Every 10 minutes, `scripts/update.sh` fetches every workspace repository, fast-forwards `main` where it
-is checked out without local changes, and clones new repositories. It never switches branches, stashes,
+is checked out without local changes, and clones new repositories. A changed or new `playbook` is installed again. It never switches branches, stashes,
 rebases, merges, deletes, re-runs setup or uses `sudo`: anything that needs a decision is only reported
 in `~/ByteLibrary/.workspace-update.md`, for example a branch behind `main`. The doctor shows the report,
 and so does a new terminal if you agreed to it during setup. Runs never overlap, and a repository with a
 git operation in progress is skipped until the next run.
+
+## Skills for agent CLIs
+Setup installs the playbook's skills in `~/.agents/skills/`, the location the Agent Skills format
+uses for sharing skills between agent CLIs.
+
+> **Note:** an agent CLI that does not read `~/.agents/skills/` does not see the skills until you point it
+> there, for example by linking that folder into the CLI's own skills folder.
 
 ## Git hooks
 Every workspace repository uses the hooks in `hooks/` (ADR-0024 of the handbook). They run
