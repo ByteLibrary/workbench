@@ -8,30 +8,34 @@ permissions:
   contents: read
 
 jobs:
-  pull-request-standards:
-    uses: ByteLibrary/reusable-ci-workflows/.github/workflows/pull-request-standards.yml@main
-  documentation:
-    uses: ByteLibrary/reusable-ci-workflows/.github/workflows/documentation.yml@main
-  shell:
-    uses: ByteLibrary/reusable-ci-workflows/.github/workflows/shell.yml@main
-  hook-tests:
-    name: Hook tests
-    runs-on: ubuntu-latest
+  compliance:
+    name: Shared
+    uses: ByteLibrary/reusable-ci-workflows/.github/workflows/compliance.yml@main
+  lint:
+    name: Shared
+    uses: ByteLibrary/reusable-ci-workflows/.github/workflows/lint.yml@main
+  tests:
+    name: Tests
+    runs-on: ubuntu-24.04
     steps:
       - name: Check out the pull request
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Check out the rules
+      - name: Check out the rules the hooks call
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           repository: ByteLibrary/reusable-ci-workflows
           path: .rules
           persist-credentials: false
-      - name: Test the git hooks
+      - name: Install the prerequisites from the README
+        run: sudo apt-get install --yes python3-yaml
+      - name: Install mise
+        uses: jdx/mise-action@9b200bcecbfd6303e69a4a261b2e09e3757440a7 # v5.2.0
+      - name: Run the tests
         env:
           RULES_REPOSITORY: .rules
-        run: scripts/test-hooks.sh
+        run: mise run test
   setup:
-    name: Setup on a fresh machine
+    name: Setup
     runs-on: ubuntu-24.04
     # Pull requests from forks get no secrets, so they cannot create the CI App's token.
     if: github.event.pull_request.head.repo.full_name == github.repository
@@ -63,16 +67,6 @@ jobs:
           BYTELIBRARY_COMMIT_NAME: ByteLibrary CI
           BYTELIBRARY_COMMIT_EMAIL: ci@bytelibrary.invalid
         run: ByteLibrary/workbench/setup.sh </dev/null
-  update-tests:
-    name: Update tests
-    runs-on: ubuntu-24.04
-    steps:
-      - name: Check out the pull request
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-      - name: Install the prerequisites from the README
-        run: sudo apt-get install --yes python3-yaml
-      - name: Test the workspace update
-        run: scripts/test-update.sh
   readme-steps:
     name: README steps
     runs-on: ubuntu-24.04

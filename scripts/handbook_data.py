@@ -6,6 +6,7 @@ would shift the fields after an empty one.
 
 Usage: handbook_data.py <handbook data directory> kinds|contexts|repositories
 """
+
 import pathlib
 import sys
 
@@ -26,8 +27,17 @@ def main():
         lines = [context["code"] for context in rows(directory, "contexts")]
     else:
         lines = [
-            "\x1f".join([repository["name"], repository["status"], repository["visibility"], repository["kind"],
-                       repository.get("context") or "", repository.get("language") or "", repository["description"]])
+            "\x1f".join(
+                [
+                    repository["name"],
+                    repository["status"],
+                    repository["visibility"],
+                    repository["kind"],
+                    repository.get("context") or "",
+                    repository.get("language") or "",
+                    repository["description"],
+                ]
+            )
             for repository in rows(directory, "repositories")
         ]
     print("\n".join(lines))
