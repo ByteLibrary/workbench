@@ -73,3 +73,24 @@ jobs:
         run: sudo apt-get install --yes python3-yaml
       - name: Test the workspace update
         run: scripts/test-update.sh
+  machine:
+    name: Machine through Multipass
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Install Multipass
+        run: |
+          sudo snap install multipass
+          # The service takes a moment to accept requests after installing.
+          for _ in $(seq 30); do sudo multipass version >/dev/null 2>&1 && break; sleep 2; done
+          sudo multipass version
+      - name: Create a machine
+        run: sudo multipass launch 24.04 --name ci-machine --cpus 2 --memory 2G --disk 10G --timeout 900
+      - name: Announce its name on the local network, as setup does
+        run: sudo multipass exec ci-machine -- sudo apt-get install --yes --quiet avahi-daemon
+      - name: Resolve .local names on the runner, as a Linux computer does
+        run: sudo apt-get install --yes --quiet avahi-daemon libnss-mdns
+      - name: The machine is reachable by name over SSH's port
+        run: |
+          getent hosts ci-machine.local
+          nc -z -w 10 ci-machine.local 22
+          echo "::notice title=Machine by name::ci-machine.local resolves and its SSH port is reachable"
