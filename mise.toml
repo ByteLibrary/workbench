@@ -1,4 +1,12 @@
-# Workbench's own commands. The Tests check in CI runs `test`.
+# Workbench's tools and its own commands. The Tests check in CI runs `test`.
+[tools]
+python = "3.14.8"
+uv = "0.12.23"
+
 [tasks.test]
-description = "Test the git hooks and the workspace update, in throwaway workspaces"
-run = ["scripts/test-hooks.sh", "scripts/test-update.sh"]
+description = "Test the git hooks, the workspace update and the doctor"
+run = [
+  "scripts/test-hooks.sh",
+  "scripts/test-update.sh",
+  "uv run --frozen python -m unittest discover --start-directory tests --top-level-directory .",
+]
