@@ -70,5 +70,32 @@ class HandbookTest(unittest.TestCase):
         self.assertEqual(merge_settings({}), "unreadable")
 
 
+class TopicsTest(unittest.TestCase):
+    def test_a_service_needs_its_kind_and_context_but_no_language_topic(self) -> None:
+        documented = [
+            {
+                "name": "catalog-service",
+                "status": "active",
+                "kind": "service",
+                "visibility": "private",
+                "description": "C",
+                "context": "catalog",
+                "language": "go",
+            }
+        ]
+        github = [
+            {
+                "name": "catalog-service",
+                "archived": False,
+                "visibility": "private",
+                "description": "C",
+                "topics": ["context-catalog", "service"],
+            }
+        ]
+        self.assertEqual(repository_differences(documented, github, {"service"}), [])
+        github[0]["topics"].append("language-go")
+        self.assertEqual(len(repository_differences(documented, github, {"service"})), 1)
+
+
 if __name__ == "__main__":
     unittest.main()
