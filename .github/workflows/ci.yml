@@ -84,7 +84,14 @@ jobs:
           for _ in $(seq 30); do sudo multipass version >/dev/null 2>&1 && break; sleep 2; done
           sudo multipass version
       - name: Create a machine
-        run: sudo multipass launch 24.04 --name ci-machine --cpus 2 --memory 2G --disk 10G --timeout 900
+        run: |
+          # Docker, preinstalled on the runner, drops forwarded traffic, which would leave the machine
+          # without a network; a developer's computer has no such rule.
+          sudo iptables -P FORWARD ACCEPT
+          if ! output="$(sudo multipass launch 24.04 --name ci-machine --cpus 2 --memory 2G --disk 10G --timeout 900 2>&1)"; then
+            echo "::error title=multipass launch::$(tail -3 <<<"$output" | tr '\n' ' ')"
+            exit 1
+          fi
       - name: Announce its name on the local network, as setup does
         run: sudo multipass exec ci-machine -- sudo apt-get install --yes --quiet avahi-daemon
       - name: Resolve .local names on the runner, as a Linux computer does
