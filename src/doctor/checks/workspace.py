@@ -28,7 +28,7 @@ def check() -> Iterator[Result]:
     )
     if HANDBOOK_DATA.is_dir():
         try:
-            expected = {repository["name"] for repository in convention_repositories()}
+            expected = {repository.name for repository in convention_repositories()}
             cloned = {directory.name for directory in workspace_repositories()}
             missing = sorted(expected - cloned)
             yield Result(

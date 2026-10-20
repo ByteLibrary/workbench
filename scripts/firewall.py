@@ -3,21 +3,23 @@
 (dnsmasq) answers only for the allowed domains and adds each address it returns to a firewall set
 (nftables); other outgoing traffic, from the machine and from containers, is refused.
 
-Usage (in the workspace, `mise run firewall:apply` and `mise run firewall:blocked`):
-  firewall.py apply              applies firewall/allowed-sites.txt and the personal file (runs with sudo)
-  firewall.py blocked [<since>]  lists the domains refused since <since>, by default in the last day
-
 The personal file is ~/.config/bytelibrary/allowed-sites, one domain per line. A systemd path unit runs
 `apply` whenever either file changes, so editing them is enough. Uses only the standard library, so the
 system's Python runs it as root.
+
+Examples (in the workspace):
+  mise run firewall:apply     apply the sites files now
+  mise run firewall:blocked   list what was refused in the last day
 """
 
+import argparse
 import collections
 import os
 import re
 import subprocess
 import sys
 from pathlib import Path
+from typing import TextIO
 
 REPOSITORY = Path(__file__).resolve().parent.parent
 SHARED_SITES = REPOSITORY / "firewall" / "allowed-sites.txt"
@@ -141,7 +143,7 @@ def blocked_addresses(kernel_log: str) -> list[str]:
     return [f"address {match.group(1)}" for match in map(REFUSED.search, kernel_log.splitlines()) if match]
 
 
-def say(colour: str, label: str, message: str, stream=sys.stdout) -> None:
+def say(colour: str, label: str, message: str, stream: TextIO = sys.stdout) -> None:
     prefix = f"\033[{colour}m{label}\033[0m" if stream.isatty() else label
     print(f"{prefix} {message}", file=stream)
 
@@ -193,16 +195,25 @@ def blocked(since: str) -> int:
 
 
 def main(argv: list[str]) -> int:
-    command, arguments = (argv[0], argv[1:]) if argv else ("", [])
-    if command in ("-h", "--help"):
-        print(__doc__)
-        return 0
-    if command == "apply" and not arguments:
-        return apply()
-    if command == "blocked" and len(arguments) <= 1:
-        return blocked(arguments[0] if arguments else "1 day ago")
-    print(__doc__.split("\n\n")[1], file=sys.stderr)
-    return 2
+    description, epilog = __doc__.split("\n\n", 1)
+    parser = argparse.ArgumentParser(
+        prog="firewall.py",
+        description=description.replace("\n", " "),
+        epilog=epilog,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    commands = parser.add_subparsers(dest="command", required=True, metavar="<command>")
+    commands.add_parser(
+        "apply", help="apply firewall/allowed-sites.txt and the personal file (runs with sudo)"
+    )
+    commands.add_parser("blocked", help="list the domains refused, by default in the last day").add_argument(
+        "since",
+        nargs="?",
+        default="1 day ago",
+        help="since when, as journalctl reads it (default: 1 day ago)",
+    )
+    arguments = parser.parse_args(argv)
+    return apply() if arguments.command == "apply" else blocked(arguments.since)
 
 
 if __name__ == "__main__":

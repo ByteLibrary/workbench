@@ -5,11 +5,12 @@ import os
 import sys
 from dataclasses import asdict
 
+from doctor.repairs import Repair
 from doctor.results import Result
 from doctor.settings import UPDATE_REPORT_FILE
 
 
-def report(results: list[Result], made: list[dict], quiet: bool, dry_run: bool) -> None:
+def report(results: list[Result], made: list[Repair], quiet: bool, dry_run: bool) -> None:
     section = None
     for result in results:
         if quiet and result.ok is not False:
@@ -30,7 +31,7 @@ def report(results: list[Result], made: list[dict], quiet: bool, dry_run: bool) 
     if made:
         print(f"==> Repairs{' --fix would make' if dry_run else ''}")
         for repair in made:
-            print(f"    {repair['repair']}{'' if dry_run else (': done' if repair['done'] else ': failed')}")
+            print(f"    {repair.repair}{'' if dry_run else (': done' if repair.done else ': failed')}")
     if not quiet and UPDATE_REPORT_FILE.exists() and UPDATE_REPORT_FILE.stat().st_size:
         print("==> Workspace updates")
         for line in UPDATE_REPORT_FILE.read_text().splitlines():
@@ -43,8 +44,13 @@ def report(results: list[Result], made: list[dict], quiet: bool, dry_run: bool) 
     )
 
 
-def as_json(results: list[Result], made: list[dict]) -> str:
+def as_json(results: list[Result], made: list[Repair]) -> str:
     failures = sum(result.ok is False for result in results)
     return json.dumps(
-        {"checks": [asdict(result) for result in results], "repairs": made, "failures": failures}, indent=2
+        {
+            "checks": [asdict(result) for result in results],
+            "repairs": [asdict(repair) for repair in made],
+            "failures": failures,
+        },
+        indent=2,
     )

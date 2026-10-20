@@ -4,11 +4,13 @@ where it is checked out without local changes, and clones new organization repos
 needs a decision is only reported, in the workspace's .workspace-update.md. Run every 10 minutes by a
 systemd user timer (scripts/configure-updates.sh), and by `mise run update`.
 
-Usage: mise run update   (in the workspace; or workbench/scripts/update.py)
-
 Uses only the standard library, so the system's Python runs it from the timer.
+
+Example:
+  mise run update   (in the workspace; or workbench/scripts/update.py)
 """
 
+import argparse
 import datetime
 import fcntl
 import os
@@ -29,7 +31,7 @@ LOCK_FILE = Path(
 CLONED = re.compile(r"^.* (\S+) \(cloned\)$", re.MULTILINE)
 
 
-def git(directory: Path, *arguments: str) -> subprocess.CompletedProcess:
+def git(directory: Path, *arguments: str) -> subprocess.CompletedProcess[str]:
     return subprocess.run(["git", "-C", str(directory), *arguments], capture_output=True, text=True)
 
 
@@ -138,9 +140,13 @@ class Update:
 
 
 def main(argv: list[str]) -> int:
-    if argv and argv[0] in ("-h", "--help"):
-        print(__doc__)
-        return 0
+    description, epilog = __doc__.split("\n\n", 1)
+    argparse.ArgumentParser(
+        prog="update.py",
+        description=description.replace("\n", " "),
+        epilog=epilog,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    ).parse_args(argv)
     LOCK_FILE.parent.mkdir(parents=True, exist_ok=True)
     with LOCK_FILE.open("w") as lock:
         # One run at a time: a run that finds another one in progress leaves it to finish.

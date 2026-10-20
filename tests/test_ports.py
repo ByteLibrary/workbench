@@ -3,15 +3,27 @@
 import unittest
 
 from doctor.checks.ports import container_ports, listening_ports, port_owners, port_problems
+from doctor.handbook import HandbookRepository, PortRange
 
 RANGES = [
-    {"code": "shared-components", "first": 8000, "last": 8099},
-    {"code": "services", "first": 8100, "last": 8999},
+    PortRange(code="shared-components", first=8000, last=8099),
+    PortRange(code="services", first=8100, last=8999),
 ]
 
 
+def repository(name: str, port_block: int | None = None) -> HandbookRepository:
+    return HandbookRepository(
+        name=name,
+        status="active",
+        visibility="private",
+        kind="service",
+        description="",
+        port_block=port_block,
+    )
+
+
 class PortsTest(unittest.TestCase):
-    owners = port_owners(RANGES, [{"name": "catalog", "port_block": 8100}, {"name": "handbook"}])
+    owners = port_owners(RANGES, [repository("catalog", 8100), repository("handbook")])
 
     def test_owners_cover_the_shared_range_and_each_block(self) -> None:
         self.assertEqual(self.owners[8000], "deployments")

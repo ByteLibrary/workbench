@@ -3,7 +3,7 @@
 from dataclasses import dataclass, field
 
 
-@dataclass
+@dataclass(frozen=True, slots=True)
 class Result:
     section: str
     name: str

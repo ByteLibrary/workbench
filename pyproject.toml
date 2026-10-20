@@ -4,7 +4,10 @@ version = "0.1.0"
 description = "The development machine's doctor."
 license = "Apache-2.0"
 requires-python = ">=3.14"
-dependencies = ["pyyaml>=6.0.2"]
+dependencies = [
+    "pydantic>=2.13.5",
+    "pyyaml>=6.0.2",
+]
 
 [project.scripts]
 doctor = "doctor.cli:main"
@@ -20,3 +23,8 @@ module-name = "doctor"
 # way the shared Lint check expects.
 [tool.ruff]
 extend = "../reusable-ci-workflows/ruff.toml"
+
+[dependency-groups]
+dev = [
+    "types-pyyaml>=6.0.12.20260906",
+]

@@ -1,10 +1,19 @@
 """What --fix repairs: only what is safe to repair, by running setup's steps again."""
 
 import sys
+from dataclasses import dataclass
 
 from doctor.commands import succeeds
 from doctor.results import Result
 from doctor.settings import REPOSITORY, WORKSPACE
+
+
+@dataclass(frozen=True, slots=True)
+class Repair:
+    """A repair --fix made, or would make with --dry-run."""
+
+    repair: str
+    done: bool
 
 
 # The repairs --fix makes: a description and the commands, each run from the workspace.
@@ -28,16 +37,16 @@ def repairs() -> dict[str, tuple[str, list[list[str]]]]:
     }
 
 
-def make_repairs(results: list[Result], dry_run: bool) -> list[dict]:
+def make_repairs(results: list[Result], dry_run: bool) -> list[Repair]:
     known = repairs()
     wanted = list(dict.fromkeys(result.repair for result in results if result.ok is False and result.repair))
-    made = []
+    made: list[Repair] = []
     for key in wanted:
         description, commands = known[key]
         if dry_run:
-            made.append({"repair": description, "done": False})
+            made.append(Repair(description, False))
             continue
         print(f"==> Repairing: {description}", file=sys.stderr)
         done = all(succeeds(command, cwd=WORKSPACE, timeout=900) for command in commands)
-        made.append({"repair": description, "done": done})
+        made.append(Repair(description, done))
     return made
