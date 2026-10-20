@@ -33,7 +33,7 @@ def check() -> Iterator[Result]:
         "On your computer: multipass umount bytelibrary.",
         details=mounts,
     )
-    recent = run([str(REPOSITORY / "scripts" / "firewall.sh"), "blocked"]).stdout.strip().splitlines()
+    recent = run([str(REPOSITORY / "scripts" / "firewall.py"), "blocked"]).stdout.strip().splitlines()
     if recent:
         yield Result(
             section, f"{len(recent)} site(s) were blocked in the last day: mise run firewall:blocked", None

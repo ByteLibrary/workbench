@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Installs the site allowlist (scripts/firewall.sh): a systemd service that applies it at boot and
+# Installs the site allowlist (scripts/firewall.py): a systemd service that applies it at boot and
 # whenever a sites file changes, the local resolver as the machine's and containers' DNS, and the
 # firewall rules. Safe to run again.
 source "$(dirname "$0")/lib.sh"
@@ -23,7 +23,7 @@ write_system_file() {
 changed=0
 write_system_file /etc/systemd/system/bytelibrary-dns.service <<EOF && changed=1
 [Unit]
-Description=ByteLibrary allowlist resolver (workbench scripts/firewall.sh)
+Description=ByteLibrary allowlist resolver (workbench scripts/firewall.py)
 After=network.target
 
 [Service]
@@ -32,7 +32,7 @@ Restart=on-failure
 EOF
 write_system_file /etc/systemd/system/bytelibrary-firewall.service <<EOF && changed=1
 [Unit]
-Description=ByteLibrary site allowlist (workbench scripts/firewall.sh)
+Description=ByteLibrary site allowlist (workbench scripts/firewall.py)
 After=network.target docker.service
 
 [Service]
@@ -41,7 +41,7 @@ Type=oneshot
 # Services start without HOME, which the scripts' shared settings use.
 Environment=HOME=/root
 Environment=BYTELIBRARY_PERSONAL_SITES=$personal_sites
-ExecStart=$REPOSITORY_DIR/scripts/firewall.sh apply
+ExecStart=$REPOSITORY_DIR/scripts/firewall.py apply
 
 [Install]
 WantedBy=multi-user.target
@@ -76,7 +76,7 @@ if write_system_file /etc/systemd/resolved.conf.d/bytelibrary.conf <<<$'[Resolve
 fi
 if [[ -L /etc/resolv.conf ]] || ! grep -qx 'nameserver 127.0.0.1' /etc/resolv.conf; then
   sudo rm -f /etc/resolv.conf
-  printf '%s\n' "# The allowlist resolver (workbench scripts/firewall.sh)." "nameserver 127.0.0.1" |
+  printf '%s\n' "# The allowlist resolver (workbench scripts/firewall.py)." "nameserver 127.0.0.1" |
     sudo tee /etc/resolv.conf >/dev/null
 fi
 
