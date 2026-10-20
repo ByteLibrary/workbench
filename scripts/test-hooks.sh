@@ -5,7 +5,7 @@ set -euo pipefail
 
 repository_dir="$(cd "$(dirname "$0")/.." && pwd)"
 rules_repository="$(cd "${RULES_REPOSITORY:-$repository_dir/../reusable-ci-workflows}" && pwd)"
-[[ -x "$rules_repository/scripts/standards.sh" ]] || { echo "rules script not found in $rules_repository" >&2; exit 1; }
+[[ -x "$rules_repository/scripts/standards.py" ]] || { echo "rules script not found in $rules_repository" >&2; exit 1; }
 
 work="$(mktemp -d)"
 trap 'rm -rf "$work"' EXIT
