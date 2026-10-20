@@ -161,7 +161,7 @@ The doctor compares the handbook's data with GitHub in both directions: every re
 with a kind topic, plus the project's Context options against `data/contexts.yaml`.
 
 ## Keeping up to date
-Every 10 minutes, `scripts/update.sh` fetches every workspace repository, fast-forwards `main` where it
+Every 10 minutes, `scripts/update.py` fetches every workspace repository, fast-forwards `main` where it
 is checked out without local changes, and clones new repositories. A changed or new `playbook` is installed again. It never switches branches, stashes,
 rebases, merges, deletes, re-runs setup or uses `sudo`: anything that needs a decision is only reported
 in `~/ByteLibrary/.workspace-update.md`, for example a branch behind `main`. The doctor shows the report,

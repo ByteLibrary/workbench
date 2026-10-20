@@ -10,7 +10,7 @@ PIP_REQUIRE_VIRTUALENV = "true"
 
 [tasks.update]
 description = "Update every workspace repository now, as the background update does every 10 minutes"
-run = "workbench/scripts/update.sh"
+run = "workbench/scripts/update.py"
 
 [tasks.doctor]
 description = "Check tools, GitHub access, the firewall, the handbook's data against GitHub and the workspace"

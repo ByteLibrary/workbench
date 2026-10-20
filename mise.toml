@@ -11,6 +11,5 @@ run = "uv run --quiet --frozen --project ../reusable-ci-workflows documentation 
 description = "Test the git hooks, the workspace update and the doctor"
 run = [
   "scripts/test-hooks.sh",
-  "scripts/test-update.sh",
   "uv run --frozen python -m unittest discover --start-directory tests --top-level-directory .",
 ]
