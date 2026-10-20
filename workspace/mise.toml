@@ -4,6 +4,9 @@
 [env]
 # gh uses the ByteLibrary-only login inside the workspace (docs/github-access.md).
 GH_CONFIG_DIR = "{{env.HOME}}/.config/gh-bytelibrary"
+# pip refuses to install outside a virtual environment: every Python project has its own, managed by uv
+# (languages/python.md in the handbook).
+PIP_REQUIRE_VIRTUALENV = "true"
 
 [tasks.update]
 description = "Update every workspace repository now, as the background update does every 10 minutes"

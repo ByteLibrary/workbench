@@ -127,6 +127,9 @@ jobs:
         run: |
           printf 'Host bytelibrary\n  HostName bytelibrary.local\n  User ubuntu\n  StrictHostKeyChecking accept-new\n' >>"$HOME/.ssh/config"
           ssh bytelibrary 'test -d ~/ByteLibrary/handbook/.git && test -x ~/.local/bin/playbook && docker info >/dev/null'
+          # pip refuses to install outside a virtual environment in the workspace; its message says so.
+          ssh bytelibrary 'cd ~/ByteLibrary && ~/.local/bin/mise exec -- python -m pip install --quiet six 2>&1' | grep -q virtualenv ||
+            { echo "::error title=Python environments::pip did not refuse to install outside a virtual environment"; exit 1; }
           # The workspace lists workbench's everyday actions as tasks.
           ssh bytelibrary 'cd ~/ByteLibrary && tasks="$(~/.local/bin/mise tasks)" && for task in update doctor sign-in firewall:apply firewall:blocked; do grep -q "^$task " <<<"$tasks" || { echo "::error title=Workspace tasks::$task is missing"; exit 1; }; done'
           echo "::notice title=README steps::Steps 1 to 4 work: the machine is set up, and reached by name over SSH"
