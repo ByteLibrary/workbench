@@ -8,7 +8,7 @@ description = "Regenerate the documentation's views and llms.txt, with the share
 run = "uv run --quiet --frozen --project ../reusable-ci-workflows documentation generate --root ."
 
 [tasks.test]
-description = "Test the git hooks, the workspace update and the doctor"
+description = "Test the git hooks, the workspace update, the firewall and the doctor"
 run = [
   "scripts/test-hooks.sh",
   "uv run --frozen python -m unittest discover --start-directory tests --top-level-directory .",

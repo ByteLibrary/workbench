@@ -145,8 +145,8 @@ jobs:
           expect "a container reaches an allowed site" "docker run --rm curlimages/curl -fsS --max-time 15 https://github.com"
           expect "a container is blocked from a site not on the list" "! docker run --rm curlimages/curl -sS --max-time 10 https://example.com"
           expect "containers reach each other" "docker network create firewall-test && docker run -d --rm --name firewall-web --network firewall-test nginx:alpine && sleep 2 && docker run --rm --network firewall-test curlimages/curl -fsS --max-time 10 http://firewall-web"
-          echo "blocked: $(~/ByteLibrary/workbench/scripts/firewall.sh blocked 2>&1 | tr '\n' ' ')"
-          expect "the blocked site is reported" "~/ByteLibrary/workbench/scripts/firewall.sh blocked | grep -q example.com"
+          echo "blocked: $(~/ByteLibrary/workbench/scripts/firewall.py blocked 2>&1 | tr '\n' ' ')"
+          expect "the blocked site is reported" "~/ByteLibrary/workbench/scripts/firewall.py blocked | grep -q example.com"
           echo example.com >>~/.config/bytelibrary/allowed-sites
           sleep 5
           expect "a site in the personal file is reachable" "curl -fsS --max-time 15 https://example.com"

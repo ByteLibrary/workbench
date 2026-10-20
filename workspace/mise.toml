@@ -22,11 +22,11 @@ run = "workbench/scripts/sign-in.sh"
 
 [tasks."firewall:blocked"]
 description = "List the sites the firewall refused in the last day"
-run = "workbench/scripts/firewall.sh blocked"
+run = "workbench/scripts/firewall.py blocked"
 
 [tasks."firewall:apply"]
 description = "Apply the sites files now; it also happens on its own when they change"
-run = "workbench/scripts/firewall.sh apply"
+run = "workbench/scripts/firewall.py apply"
 
 [tools]
 # Only what the workspace itself needs (ADR-0028). Tools a repository builds, tests or lints with are

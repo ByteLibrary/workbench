@@ -4,7 +4,7 @@
 #
 # To allow a site for everyone, add it here in its group, as narrow as practical, in a pull request.
 # To allow one only on your machine, add it to ~/.config/bytelibrary/allowed-sites. Both apply as soon
-# as the file changes. `scripts/firewall.sh blocked` shows what was refused.
+# as the file changes. `scripts/firewall.py blocked` shows what was refused.
 #
 # Kept off on purpose: general file and paste hosts, URL shorteners, general cloud storage, cloud
 # provider APIs (added narrowly when a provider is chosen) and services we do not use.
