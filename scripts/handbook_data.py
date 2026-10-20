@@ -2,28 +2,42 @@
 """Prints facts from the handbook's data tables, one record per line, for the shell scripts.
 
 Fields are separated by the ASCII unit separator (\\x1f), not tabs: bash collapses consecutive tabs, which
-would shift the fields after an empty one.
+would shift the fields after an empty one. Runs on the system's Python, with its own PyYAML.
 
-Usage: handbook_data.py <handbook data directory> kinds|contexts|repositories
+Example:
+  handbook_data.py ~/ByteLibrary/handbook/data kinds
 """
 
+import argparse
 import pathlib
 import sys
+from typing import Any
 
 import yaml
 
 
-def rows(directory, table):
-    return yaml.safe_load((pathlib.Path(directory) / f"{table}.yaml").read_text(encoding="utf-8")) or []
+def rows(directory: str, table: str) -> list[dict[str, Any]]:
+    loaded: list[dict[str, Any]] = (
+        yaml.safe_load((pathlib.Path(directory) / f"{table}.yaml").read_text(encoding="utf-8")) or []
+    )
+    return loaded
 
 
-def main():
-    if len(sys.argv) != 3 or sys.argv[2] not in ("kinds", "contexts", "repositories"):
-        sys.exit(__doc__)
-    directory, query = sys.argv[1], sys.argv[2]
-    if query == "kinds":
+def main(argv: list[str]) -> int:
+    description, epilog = __doc__.split("\n\n", 1)
+    parser = argparse.ArgumentParser(
+        prog="handbook_data.py",
+        description=description,
+        epilog=epilog,
+        formatter_class=argparse.RawDescriptionHelpFormatter,
+    )
+    parser.add_argument("directory", help="the handbook's data folder")
+    parser.add_argument("query", choices=("kinds", "contexts", "repositories"), help="what to print")
+    arguments = parser.parse_args(argv)
+    directory = arguments.directory
+    if arguments.query == "kinds":
         lines = [kind["code"] for kind in rows(directory, "repository-kinds")]
-    elif query == "contexts":
+    elif arguments.query == "contexts":
         lines = [context["code"] for context in rows(directory, "contexts")]
     else:
         lines = [
@@ -41,7 +55,8 @@ def main():
             for repository in rows(directory, "repositories")
         ]
     print("\n".join(lines))
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    sys.exit(main(sys.argv[1:]))

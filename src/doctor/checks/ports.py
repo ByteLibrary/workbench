@@ -4,29 +4,29 @@ import re
 from collections.abc import Iterator
 
 from doctor.commands import run
-from doctor.handbook import rows
+from doctor.handbook import HandbookRepository, PortRange, rows
 from doctor.results import Result
 from doctor.settings import HANDBOOK_DATA, SHARED_COMPONENTS_OWNER
 
 
-def port_owners(ranges: list[dict], repositories: list[dict]) -> dict[int, str]:
+def port_owners(ranges: list[PortRange], repositories: list[HandbookRepository]) -> dict[int, str]:
     """Which repository each recorded port belongs to: the shared range, and each service's block."""
-    owners = {}
+    owners: dict[int, str] = {}
     for port_range in ranges:
-        if port_range["code"] == "shared-components":
+        if port_range.code == "shared-components":
             owners.update(
-                dict.fromkeys(range(port_range["first"], port_range["last"] + 1), SHARED_COMPONENTS_OWNER)
+                dict.fromkeys(range(port_range.first, port_range.last + 1), SHARED_COMPONENTS_OWNER)
             )
     for repository in repositories:
-        if repository.get("port_block") is not None:
-            block = repository["port_block"]
-            owners.update(dict.fromkeys(range(block, block + 10), repository["name"]))
+        if repository.port_block is not None:
+            block = repository.port_block
+            owners.update(dict.fromkeys(range(block, block + 10), repository.name))
     return owners
 
 
 def listening_ports(ss_output: str) -> set[int]:
     """TCP ports something listens on, from `ss --listening --tcp --numeric --no-header`."""
-    ports = set()
+    ports: set[int] = set()
     for line in ss_output.splitlines():
         columns = line.split()
         if len(columns) >= 4 and (match := re.search(r":(\d+)$", columns[3])):
@@ -37,7 +37,7 @@ def listening_ports(ss_output: str) -> set[int]:
 def container_ports(docker_output: str) -> dict[int, tuple[str, str]]:
     """Published ports, each with its container and Compose project, from `docker ps` in the format
     `{{.Names}}\\t{{.Label "com.docker.compose.project"}}\\t{{.Ports}}`."""
-    published = {}
+    published: dict[int, tuple[str, str]] = {}
     for line in docker_output.splitlines():
         name, project, ports = (line.split("\t") + ["", ""])[:3]
         for port in re.findall(r":(\d+)->", ports):
@@ -48,7 +48,7 @@ def container_ports(docker_output: str) -> dict[int, tuple[str, str]]:
 def port_problems(
     owners: dict[int, str], listening: set[int], published: dict[int, tuple[str, str]]
 ) -> list[str]:
-    problems = []
+    problems: list[str] = []
     for port in sorted(listening & owners.keys()):
         owner = owners[port]
         if port not in published:
@@ -75,7 +75,7 @@ def check() -> Iterator[Result]:
             "clone",
         )
         return
-    owners = port_owners(rows("port-ranges"), rows("repositories"))
+    owners = port_owners(rows("port-ranges", PortRange), rows("repositories", HandbookRepository))
     listening = listening_ports(run(["ss", "--listening", "--tcp", "--numeric", "--no-header"]).stdout)
     docker = run(
         ["docker", "ps", "--format", '{{.Names}}\t{{.Label "com.docker.compose.project"}}\t{{.Ports}}']

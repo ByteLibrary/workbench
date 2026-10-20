@@ -1,21 +1,33 @@
 """Tools at their pinned versions, and Docker."""
 
-import json
 import shutil
 from collections.abc import Iterator
 
+from pydantic import TypeAdapter, ValidationError
+
 from doctor.commands import run, succeeds
+from doctor.outside import Outside
 from doctor.results import Result
 from doctor.settings import HOME, WORKSPACE, workspace_repositories
 
 
-def missing_tools(listing: dict) -> list[str]:
-    """Tools a mise.toml pins that are not installed, from `mise ls --current --json`."""
+class MiseVersion(Outside):
+    version: str | None = None
+    requested_version: str | None = None
+    installed: bool = False
+
+
+# `mise ls --current --json`: each tool with its pinned versions.
+MISE_LISTING = TypeAdapter(dict[str, list[MiseVersion]])
+
+
+def missing_tools(listing: dict[str, list[MiseVersion]]) -> list[str]:
+    """Tools a mise.toml pins that are not installed."""
     return sorted(
-        f"{tool}@{version.get('requested_version') or version.get('version')}"
+        f"{tool}@{version.requested_version or version.version}"
         for tool, versions in listing.items()
         for version in versions
-        if not version.get("installed")
+        if not version.installed
     )
 
 
@@ -25,14 +37,14 @@ def check() -> Iterator[Result]:
         installed = shutil.which(tool) is not None or (HOME / ".local" / "bin" / tool).exists()
         yield Result(section, f"{tool} is installed", installed, "Run setup.sh again.")
     mise = shutil.which("mise") or str(HOME / ".local" / "bin" / "mise")
-    missing = []
+    missing: list[str] = []
     for directory in [WORKSPACE, *workspace_repositories()]:
         if not (directory / "mise.toml").exists():
             continue
         listed = run([mise, "ls", "--current", "--json"], cwd=directory)
         try:
-            tools = missing_tools(json.loads(listed.stdout or "{}"))
-        except json.JSONDecodeError:
+            tools = missing_tools(MISE_LISTING.validate_json(listed.stdout or "{}"))
+        except ValidationError:
             tools = ["(mise could not read its configuration)"]
         missing += [f"{directory.name}: {tool}" for tool in tools]
     yield Result(

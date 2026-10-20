@@ -1,19 +1,27 @@
 """Credentials besides the ByteLibrary sign-in and the developer's agent CLI's."""
 
-import json
 import os
 import re
-from collections.abc import Iterator
+from collections.abc import Iterator, Mapping
 from pathlib import Path
 
+from pydantic import ValidationError
+
 from doctor.commands import run
+from doctor.outside import Outside
 from doctor.results import Result
 from doctor.settings import HOME
 
 
-def stray_credentials(home: Path, environment: dict) -> list[str]:
+class DockerSettings(Outside):
+    """Docker's ~/.docker/config.json: each registry with its login, empty when logged out."""
+
+    auths: dict[str, object] = {}
+
+
+def stray_credentials(home: Path, environment: Mapping[str, str]) -> list[str]:
     """Credentials besides the ByteLibrary sign-in. Agent tools' own folders are never looked at."""
-    found = []
+    found: list[str] = []
     hosts = home / ".config" / "gh" / "hosts.yml"
     if hosts.exists() and hosts.read_text(encoding="utf-8").strip() not in ("", "{}"):
         found.append(f"a gh login outside the workspace ({hosts}): gh auth logout, then delete the file")
@@ -39,12 +47,9 @@ def stray_credentials(home: Path, environment: dict) -> list[str]:
     docker = home / ".docker" / "config.json"
     if docker.exists():
         try:
-            logins = [
-                registry
-                for registry, entry in json.loads(docker.read_text()).get("auths", {}).items()
-                if entry
-            ]
-        except json.JSONDecodeError, AttributeError:
+            auths = DockerSettings.model_validate_json(docker.read_text()).auths
+            logins = [registry for registry, entry in auths.items() if entry]
+        except ValidationError:
             logins = []
         if logins:
             found.append(f"Docker registry logins ({', '.join(logins)}): docker logout <registry>")
@@ -59,7 +64,7 @@ def stray_credentials(home: Path, environment: dict) -> list[str]:
 
 def check() -> Iterator[Result]:
     section = "Credentials"
-    found = stray_credentials(HOME, dict(os.environ))
+    found = stray_credentials(HOME, os.environ)
     yield Result(
         section,
         "no credentials besides the ByteLibrary sign-in and your agent CLI's",

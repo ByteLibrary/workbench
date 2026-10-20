@@ -9,6 +9,7 @@ from pathlib import Path
 SCRIPT = Path(__file__).resolve().parent.parent / "scripts" / "firewall.py"
 
 spec = importlib.util.spec_from_file_location("firewall", SCRIPT)
+assert spec is not None and spec.loader is not None
 firewall = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(firewall)
 

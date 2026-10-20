@@ -18,7 +18,7 @@ import os
 
 from doctor import commands
 from doctor.checks import CHECKS, check_everything
-from doctor.repairs import make_repairs
+from doctor.repairs import Repair, make_repairs
 from doctor.report import as_json, report
 
 
@@ -53,7 +53,7 @@ def main(argv: list[str] | None = None) -> int:
     commands.verbose = arguments.verbose
 
     results = check_everything(arguments.skip)
-    made = []
+    made: list[Repair] = []
     if arguments.fix:
         made = make_repairs(results, arguments.dry_run)
         if made and not arguments.dry_run:

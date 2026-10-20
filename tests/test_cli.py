@@ -3,7 +3,9 @@
 import contextlib
 import io
 import json
+import os
 import unittest
+from collections.abc import Callable, Iterator
 from unittest import mock
 
 from doctor import checks, cli, repairs
@@ -11,7 +13,7 @@ from doctor.results import Result
 
 
 class RunTest(unittest.TestCase):
-    def results(self) -> list:
+    def results(self) -> list[Result]:
         return [
             Result("Tools", "Docker daemon is reachable", False, "Start Docker.", "docker"),
             Result("Credentials", "no credentials", False, "Remove them."),
@@ -66,10 +68,10 @@ class RunTest(unittest.TestCase):
 
 class SkipTest(unittest.TestCase):
     def test_a_skipped_group_is_not_run_and_is_reported(self) -> None:
-        ran = []
+        ran: list[str] = []
 
-        def group(name):
-            def check():
+        def group(name: str) -> Callable[[], Iterator[Result]]:
+            def check() -> Iterator[Result]:
                 ran.append(name)
                 yield Result(name, f"{name} check", True)
 
@@ -89,7 +91,7 @@ class SkipTest(unittest.TestCase):
 
     def test_an_unknown_group_in_the_environment_is_wrong_usage(self) -> None:
         with (
-            mock.patch.dict(cli.os.environ, {"BYTELIBRARY_DOCTOR_SKIP": "credentials bogus"}),
+            mock.patch.dict(os.environ, {"BYTELIBRARY_DOCTOR_SKIP": "credentials bogus"}),
             contextlib.redirect_stderr(io.StringIO()),
             self.assertRaises(SystemExit) as exit,
         ):

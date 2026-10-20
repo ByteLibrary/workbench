@@ -1,6 +1,6 @@
 """Every group of checks, and running them."""
 
-from collections.abc import Callable, Iterator
+from collections.abc import Callable, Collection, Iterator
 
 from doctor.checks import credentials, firewall, github_data, ports, sign_in, tools, workspace
 from doctor.results import Result
@@ -17,8 +17,8 @@ CHECKS: dict[str, Callable[[], Iterator[Result]]] = {
 }
 
 
-def check_everything(skip: list[str] = ()) -> list[Result]:
-    results = []
+def check_everything(skip: Collection[str] = ()) -> list[Result]:
+    results: list[Result] = []
     for name, check in CHECKS.items():
         if name in skip:
             results.append(Result(name, f"skipped on request (--skip {name})", None))

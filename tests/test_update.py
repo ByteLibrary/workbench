@@ -20,6 +20,13 @@ esac
 
 
 class UpdateTest(unittest.TestCase):
+    directory: tempfile.TemporaryDirectory[str]
+    work: Path
+    workspace: Path
+    remotes: Path
+    environment: dict[str, str]
+    report: str
+
     @classmethod
     def setUpClass(cls) -> None:
         cls.directory = tempfile.TemporaryDirectory()
