@@ -44,7 +44,7 @@ def stray_credentials(home: Path, environment: dict) -> list[str]:
                 for registry, entry in json.loads(docker.read_text()).get("auths", {}).items()
                 if entry
             ]
-        except (json.JSONDecodeError, AttributeError):
+        except json.JSONDecodeError, AttributeError:
             logins = []
         if logins:
             found.append(f"Docker registry logins ({', '.join(logins)}): docker logout <registry>")

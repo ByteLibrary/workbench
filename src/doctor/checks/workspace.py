@@ -39,7 +39,7 @@ def check() -> Iterator[Result]:
                 "clone",
                 missing,
             )
-        except (RuntimeError, FileNotFoundError):
+        except RuntimeError, FileNotFoundError:
             pass
 
     without_hooks, behind = [], []
