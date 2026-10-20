@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Keeps the workspace up to date in the background (ADR-0023): a systemd user timer runs
-# scripts/update.sh every 10 minutes, and, if the developer agrees, the report shows when a terminal
+# scripts/update.py every 10 minutes, and, if the developer agrees, the report shows when a terminal
 # opens.
 source "$(dirname "$0")/lib.sh"
 
@@ -16,7 +16,7 @@ Description=Update the ByteLibrary workspace
 [Service]
 Type=oneshot
 Environment=BYTELIBRARY_WORKSPACE_DIR=$WORKSPACE_DIR
-ExecStart=$REPOSITORY_DIR/scripts/update.sh
+ExecStart=$REPOSITORY_DIR/scripts/update.py
 UNIT
   cat >"$units/bytelibrary-update.timer" <<UNIT
 [Unit]
