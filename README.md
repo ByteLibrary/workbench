@@ -101,7 +101,7 @@ ByteLibrary CI App (`CI_APP_CLIENT_ID` and `CI_APP_PRIVATE_KEY`, see [docs/githu
 | `~/.config/bytelibrary/git-credentials` | The same sign-in for git, readable only by you |
 | `~/.gitconfig-bytelibrary` | Commit identity, GitHub credentials and the organization's git hooks (`hooks/`) for workspace repositories |
 | `~/.gitconfig` | One `includeIf` line that loads the file above only under `~/ByteLibrary/`. With your confirmation, removes machine-wide GitHub credential helpers (a backup is kept). |
-| `~/ByteLibrary/` | All repositories, plus the workspace `AGENTS.md`, `mise.toml` and `ByteLibrary.code-workspace` (opens every repository in VS Code) |
+| `~/ByteLibrary/` | All repositories, plus the workspace `AGENTS.md`, `mise.toml` (its tools, tasks and environment: the ByteLibrary-only `gh` login, and pip refusing to install outside a virtual environment) and `ByteLibrary.code-workspace` (opens every repository in VS Code) |
 | `~/.bashrc` | With your confirmation, one line that activates mise in new shells |
 | `~/.local/bin/playbook` | The [playbook](https://github.com/ByteLibrary/playbook)'s command, installed by its own installer |
 | `~/.agents/skills/bytelibrary-*` | The playbook's skills, in the shared location agent CLIs read skills from |
