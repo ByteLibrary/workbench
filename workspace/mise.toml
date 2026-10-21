@@ -11,7 +11,7 @@ PIP_REQUIRE_VIRTUALENV = "true"
 [tasks.update]
 description = "Update every workspace repository now, as the background update does every 10 minutes"
 # Workbench's scripts run on the Python workbench pins.
-run = "mise -C workbench exec -- python scripts/update.py"
+run = "{{mise_bin}} -C workbench exec -- python scripts/update.py"
 
 [tasks.doctor]
 description = "Check tools, GitHub access, the firewall, the handbook's data against GitHub and the workspace"
@@ -23,11 +23,11 @@ run = "workbench/scripts/sign-in.sh"
 
 [tasks."firewall:blocked"]
 description = "List the sites the firewall refused in the last day"
-run = "mise -C workbench exec -- python scripts/firewall.py blocked"
+run = "{{mise_bin}} -C workbench exec -- python scripts/firewall.py blocked"
 
 [tasks."firewall:apply"]
 description = "Apply the sites files now; it also happens on its own when they change"
-run = "mise -C workbench exec -- python scripts/firewall.py apply"
+run = "{{mise_bin}} -C workbench exec -- python scripts/firewall.py apply"
 
 [tools]
 # Only what the workspace itself needs (ADR-0028). Tools a repository builds, tests or lints with are
