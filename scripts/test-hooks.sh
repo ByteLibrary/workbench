@@ -9,6 +9,9 @@ rules_repository="$(cd "${RULES_REPOSITORY:-$repository_dir/../reusable-ci-workf
 
 work="$(mktemp -d)"
 trap 'rm -rf "$work"' EXIT
+# The throwaway home keeps mise's installed tools and trusted files, so the hooks find the pinned Python.
+export MISE_DATA_DIR="${MISE_DATA_DIR:-$HOME/.local/share/mise}"
+export MISE_STATE_DIR="${MISE_STATE_DIR:-$HOME/.local/state/mise}" MISE_CACHE_DIR="${MISE_CACHE_DIR:-$HOME/.cache/mise}"
 export BYTELIBRARY_WORKSPACE_DIR="$work/workspace" HOME="$work/home"
 mkdir -p "$BYTELIBRARY_WORKSPACE_DIR" "$HOME"
 ln -s "$rules_repository" "$BYTELIBRARY_WORKSPACE_DIR/reusable-ci-workflows"

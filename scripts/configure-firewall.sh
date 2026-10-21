@@ -4,6 +4,8 @@
 # firewall rules. Safe to run again.
 source "$(dirname "$0")/lib.sh"
 
+python="$(configured_python "$REPOSITORY_DIR")"
+
 personal_sites="$HOME/.config/bytelibrary/allowed-sites"
 mkdir -p "$(dirname "$personal_sites")"
 if [[ ! -f "$personal_sites" ]]; then
@@ -41,7 +43,8 @@ Type=oneshot
 # Services start without HOME, which the scripts' shared settings use.
 Environment=HOME=/root
 Environment=BYTELIBRARY_PERSONAL_SITES=$personal_sites
-ExecStart=$REPOSITORY_DIR/scripts/firewall.py apply
+# The Python workbench pins; setup writes this again when the pin changes.
+ExecStart=$python $REPOSITORY_DIR/scripts/firewall.py apply
 
 [Install]
 WantedBy=multi-user.target
@@ -83,7 +86,7 @@ fi
 # Containers ask the same resolver, on Docker's bridge.
 docker_config=/etc/docker/daemon.json
 # On a fresh machine, Docker has no settings file yet.
-docker_dns="$({ sudo cat "$docker_config" 2>/dev/null || true; } | python3 -c '
+docker_dns="$({ sudo cat "$docker_config" 2>/dev/null || true; } | "$python" -c '
 import json, sys
 text = sys.stdin.read()
 config = json.loads(text) if text.strip() else {}

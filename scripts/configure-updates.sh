@@ -16,7 +16,8 @@ Description=Update the ByteLibrary workspace
 [Service]
 Type=oneshot
 Environment=BYTELIBRARY_WORKSPACE_DIR=$WORKSPACE_DIR
-ExecStart=$REPOSITORY_DIR/scripts/update.py
+# The Python workbench pins; setup writes this again when the pin changes.
+ExecStart=$(configured_python "$REPOSITORY_DIR") $REPOSITORY_DIR/scripts/update.py
 UNIT
   cat >"$units/bytelibrary-update.timer" <<UNIT
 [Unit]

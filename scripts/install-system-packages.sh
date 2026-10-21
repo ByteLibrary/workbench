@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 # Installs what the development machine needs from Ubuntu's package manager, and only that (ADR-0028 of
-# the handbook): bootstrapping (git, curl, CA certificates), Python with PyYAML for setup's own scripts,
-# avahi-daemon, which announces the machine as bytelibrary.local so editors find it after its address
-# changes, dnsmasq and nftables for the site allowlist (scripts/firewall.py), and Docker Engine from
-# Docker's repository. Every other tool comes from mise. Safe to run again.
+# the handbook): bootstrapping (git, curl, CA certificates), avahi-daemon, which announces the machine as
+# bytelibrary.local so editors find it after its address changes, dnsmasq and nftables for the site
+# allowlist (scripts/firewall.py), and Docker Engine from Docker's repository. Every other tool comes from
+# mise. Safe to run again.
 source "$(dirname "$0")/lib.sh"
 
 [[ "$(. /etc/os-release && echo "$ID")" == ubuntu ]] || fail "The development machine runs Ubuntu; this is not Ubuntu."
 
-packages=(git curl ca-certificates python3 python3-yaml avahi-daemon dnsmasq-base nftables)
+packages=(git curl ca-certificates avahi-daemon dnsmasq-base nftables)
 missing=()
 for package in "${packages[@]}"; do
   dpkg-query --show --showformat='${Status}' "$package" 2>/dev/null | grep -q "install ok installed" || missing+=("$package")

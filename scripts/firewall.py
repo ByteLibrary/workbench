@@ -4,8 +4,8 @@
 (nftables); other outgoing traffic, from the machine and from containers, is refused.
 
 The personal file is ~/.config/bytelibrary/allowed-sites, one domain per line. A systemd path unit runs
-`apply` whenever either file changes, so editing them is enough. Uses only the standard library, so the
-system's Python runs it as root.
+`apply` whenever either file changes, so editing them is enough. The service runs it as root on the Python
+workbench pins (scripts/configure-firewall.sh).
 
 Examples (in the workspace):
   mise run firewall:apply     apply the sites files now
@@ -156,7 +156,9 @@ def fail(message: str) -> int:
 def apply() -> int:
     if os.geteuid() != 0:
         script = str(Path(__file__).resolve())
-        os.execvp("sudo", ["sudo", f"BYTELIBRARY_PERSONAL_SITES={PERSONAL_SITES}", script, "apply"])
+        # Again as root, on the same Python: sudo's own path would find the machine's.
+        arguments = [f"BYTELIBRARY_PERSONAL_SITES={PERSONAL_SITES}", sys.executable, script, "apply"]
+        os.execvp("sudo", ["sudo", *arguments])
     try:
         allowed = domains(SHARED_SITES) + domains(PERSONAL_SITES)
     except NotADomain as problem:

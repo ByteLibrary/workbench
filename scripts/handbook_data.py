@@ -2,7 +2,7 @@
 """Prints facts from the handbook's data tables, one record per line, for the shell scripts.
 
 Fields are separated by the ASCII unit separator (\\x1f), not tabs: bash collapses consecutive tabs, which
-would shift the fields after an empty one. Runs on the system's Python, with its own PyYAML.
+would shift the fields after an empty one. Runs in workbench's environment, which has PyYAML (lib.sh).
 
 Example:
   handbook_data.py ~/ByteLibrary/handbook/data kinds

@@ -55,7 +55,7 @@ Setup installs everything else itself, at versions pinned in git:
 
 | What | From |
 |---|---|
-| git, curl, CA certificates, Python 3 with PyYAML (for setup's own scripts), avahi-daemon (announces `bytelibrary.local`) | Ubuntu's packages |
+| git, curl, CA certificates, avahi-daemon (announces `bytelibrary.local`) | Ubuntu's packages |
 | Docker Engine, and the `docker` group for you | Docker's repository |
 | mise, then `gh`, Python and ShellCheck for the workspace, and each repository's own tools | mise's installer and `mise install` |
 

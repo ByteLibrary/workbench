@@ -73,14 +73,23 @@ store_git_credentials() {
   )
 }
 
-# Facts from the handbook's data tables (see handbook_data.py). Uses the handbook's own environment, which
-# has the pinned YAML library, once it exists; the system Python until then.
+# Runs a command in a workspace project's folder, with the tools its mise.toml pins (installed if needed).
+with_project_tools() {
+  mise trust --quiet "$1/mise.toml" && mise -C "$1" exec -- "${@:2}"
+}
+
+# The interpreter of the Python a project's mise.toml pins. For what runs outside a mise shell, such as
+# systemd services and git hooks, so it still runs on the configured version.
+configured_python() {
+  with_project_tools "$1" python -c 'import sys; print(sys.executable)'
+}
+
+# Facts from the handbook's data tables (see handbook_data.py), read in workbench's own environment, which
+# has the pinned YAML library.
 handbook_data() {
-  # The system's Python, which has PyYAML (install-system-packages.sh); mise's Python may not.
-  local python=/usr/bin/python3
-  [[ -x "$WORKSPACE_DIR/handbook/.venv/bin/python" ]] && python="$WORKSPACE_DIR/handbook/.venv/bin/python"
   [[ -d "$HANDBOOK_DATA_DIR" ]] || fail "The handbook's data is missing: $HANDBOOK_DATA_DIR"
-  "$python" "$REPOSITORY_DIR/scripts/handbook_data.py" "$HANDBOOK_DATA_DIR" "$1"
+  with_project_tools "$REPOSITORY_DIR" \
+    uv run --quiet --frozen python scripts/handbook_data.py "$HANDBOOK_DATA_DIR" "$1"
 }
 
 # Prints the names of the non-archived repositories that follow the conventions: those with a kind topic
