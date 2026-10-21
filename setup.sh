@@ -7,10 +7,11 @@ mkdir -p "$WORKSPACE_DIR"
 cd "$WORKSPACE_DIR" || exit
 
 "$REPOSITORY_DIR/scripts/install-system-packages.sh"
-"$REPOSITORY_DIR/scripts/configure-firewall.sh"
 "$REPOSITORY_DIR/scripts/authorize-ssh-key.sh"
 "$REPOSITORY_DIR/scripts/write-workspace-files.sh"
+# The tools come before the firewall, which runs on the Python that workbench pins.
 "$REPOSITORY_DIR/scripts/install-tools.sh"
+"$REPOSITORY_DIR/scripts/configure-firewall.sh"
 "$REPOSITORY_DIR/scripts/configure-github-access.sh"
 "$REPOSITORY_DIR/scripts/configure-git-hooks.sh"
 "$REPOSITORY_DIR/scripts/clone-repositories.sh"

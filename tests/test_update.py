@@ -1,5 +1,5 @@
 """The workspace update, in a throwaway workspace against local bare repositories, with a stand-in for gh
-that lists and clones them. Needs the system's Python with PyYAML, like setup."""
+that lists and clones them."""
 
 import fcntl
 import os
@@ -40,8 +40,14 @@ class UpdateTest(unittest.TestCase):
         (work / "bin" / "uv").write_text("#!/usr/bin/env bash\nexit 0\n")
         for tool in ("gh", "uv"):
             (work / "bin" / tool).chmod(0o755)
+        home = Path.home()
         cls.environment = {
             **os.environ,
+            # The throwaway home keeps mise's and uv's installs, so workbench's tools are found as pinned.
+            "MISE_DATA_DIR": os.environ.get("MISE_DATA_DIR", str(home / ".local" / "share" / "mise")),
+            "MISE_STATE_DIR": os.environ.get("MISE_STATE_DIR", str(home / ".local" / "state" / "mise")),
+            "MISE_CACHE_DIR": os.environ.get("MISE_CACHE_DIR", str(home / ".cache" / "mise")),
+            "UV_CACHE_DIR": os.environ.get("UV_CACHE_DIR", str(home / ".cache" / "uv")),
             "HOME": str(work / "home"),
             "BYTELIBRARY_WORKSPACE_DIR": str(cls.workspace),
             "BYTELIBRARY_UPDATE_LOCK_FILE": str(work / "update.lock"),

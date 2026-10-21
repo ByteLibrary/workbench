@@ -4,5 +4,7 @@
 rules() {
   local script="$WORKSPACE_DIR/reusable-ci-workflows/scripts/standards.py"
   [[ -x "$script" ]] || fail "The organization's rules are missing ($script). Run setup.sh, which clones reusable-ci-workflows."
-  "$script" "$@" || fail "Fix the problems above, then try again."
+  # On the Python that reusable-ci-workflows pins, as in CI.
+  "$(configured_python "$WORKSPACE_DIR/reusable-ci-workflows")" "$script" "$@" ||
+    fail "Fix the problems above, then try again."
 }

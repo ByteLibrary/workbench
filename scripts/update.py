@@ -4,7 +4,7 @@ where it is checked out without local changes, and clones new organization repos
 needs a decision is only reported, in the workspace's .workspace-update.md. Run every 10 minutes by a
 systemd user timer (scripts/configure-updates.sh), and by `mise run update`.
 
-Uses only the standard library, so the system's Python runs it from the timer.
+The timer runs it on the Python workbench pins (scripts/configure-updates.sh).
 
 Example:
   mise run update   (in the workspace; or workbench/scripts/update.py)
